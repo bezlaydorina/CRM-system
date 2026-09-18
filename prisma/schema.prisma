@@ -1,0 +1,412 @@
+// Synk AI CRM - data model
+// NOTE: SQLite datasource does not support native Prisma enums, so
+// enum-like fields are declared as String and validated in application
+// code (see src/lib/enums.ts) against the same values used here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Core tenancy
+// ---------------------------------------------------------------------------
+
+model Organization {
+  id             String          @id @default(cuid())
+  name           String
+  createdAt      DateTime        @default(now())
+  accounts       Account[]
+  teamMembers    TeamMember[]
+  tasks          Task[]
+  calendarEvents CalendarEvent[]
+}
+
+model TeamMember {
+  id                      String       @id @default(cuid())
+  organizationId          String
+  organization            Organization @relation(fields: [organizationId], references: [id])
+  name                    String
+  email                   String       @unique
+  phone                   String?
+  passwordHash            String
+  avatarColor             String       @default("#6366f1")
+  jobRole                 String // Admin, CSM, Closer, Setter, Szövegíró, Grafikus, LP Építő, PPC Specialista, Értékesítő
+  systemRole              String       @default("STAFF") // ADMIN | STAFF
+  googleCalendarConnected Boolean      @default(false)
+  createdAt               DateTime     @default(now())
+
+  assignments      TeamAssignment[]
+  tasksAssigned    Task[]             @relation("TaskAssignee")
+  notes            Note[]
+  activityEntries  ActivityLogEntry[]
+  approvalsCreated ApprovalItem[]     @relation("ApprovalCreatedBy")
+  calendarEvents   CalendarEvent[]
+  messages         Message[]          @relation("StaffMessages")
+}
+
+// ---------------------------------------------------------------------------
+// Account (tenant / client company)
+// ---------------------------------------------------------------------------
+
+model Account {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  name               String
+  website            String?
+  industry           String?
+  status             String   @default("ACTIVE") // ACTIVE | ARCHIVED
+  lifecycleStage     String   @default("CSM_CONTACT") // see enums.ts ACCOUNT_LIFECYCLE_STAGES
+  lifecycleEnteredAt DateTime @default(now())
+
+  monthlyFee       Float     @default(0)
+  setupFee         Float     @default(0)
+  monthlyAdBudget  Float     @default(0)
+  startDate        DateTime?
+  adsLive          Boolean   @default(false)
+  contractSignedAt DateTime?
+  lastPaymentAt    DateTime?
+  source           String?
+  isTestAccount    Boolean   @default(false)
+  isInternalSales  Boolean   @default(false) // true for the agency's own sales pipeline "account"
+
+  nameFormat        String  @default("HU") // HU | EN
+  callButtonEnabled Boolean @default(true)
+  featureFlags      String  @default("{\"crm\":true,\"calendar\":true,\"chatGptAdsTab\":false}") // JSON
+
+  portalPasswordHash String? // shared portal login fallback
+
+  createdAt DateTime @default(now())
+
+  contacts        Contact[]
+  assignments     TeamAssignment[]
+  pipelines       Pipeline[]
+  tasks           Task[]
+  approvalItems   ApprovalItem[]
+  payments        Payment[]
+  contracts       Contract[]
+  reports         Report[]
+  conversation    Conversation?
+  fileAssets      FileAsset[]
+  adMetrics       AdMetricSnapshot[]
+  credentials     Credential[]
+  activityEntries ActivityLogEntry[]
+  calendarEvents  CalendarEvent[]
+}
+
+model Contact {
+  id             String   @id @default(cuid())
+  accountId      String
+  account        Account  @relation(fields: [accountId], references: [id])
+  fullName       String
+  email          String?
+  phone          String?
+  position       String?
+  isPrimary      Boolean  @default(false)
+  canLoginPortal Boolean  @default(false)
+  passwordHash   String?
+  accessLevel    String   @default("FULL") // FULL | LIMITED
+  createdAt      DateTime @default(now())
+
+  calendarEvents CalendarEvent[]
+  messages       Message[]       @relation("ClientMessages")
+}
+
+model TeamAssignment {
+  id           String     @id @default(cuid())
+  accountId    String
+  account      Account    @relation(fields: [accountId], references: [id])
+  teamMemberId String
+  teamMember   TeamMember @relation(fields: [teamMemberId], references: [id])
+  role         String // Closer, Setter, CSM, Szövegíró, Grafikus, LP Építő, PPC Specialista, Admin
+
+  @@unique([accountId, teamMemberId, role])
+}
+
+// ---------------------------------------------------------------------------
+// Mini-CRM (per account)
+// ---------------------------------------------------------------------------
+
+model Pipeline {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id])
+  name      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  stages          Stage[]
+  webhooks        Webhook[]
+  customFieldDefs CustomFieldDefinition[]
+}
+
+model Stage {
+  id         String   @id @default(cuid())
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id])
+  name       String
+  color      String   @default("#6366f1")
+  order      Int      @default(0)
+
+  opportunities Opportunity[]
+  webhooks      Webhook[]
+}
+
+model Opportunity {
+  id        String @id @default(cuid())
+  stageId   String
+  stage     Stage  @relation(fields: [stageId], references: [id])
+  accountId String
+
+  firstName       String
+  lastName        String?
+  email           String?
+  phone           String?
+  company         String?
+  opportunityName String
+  status          String   @default("OPEN") // OPEN | WON | LOST
+  value           Float    @default(0)
+  source          String?
+  customFields    String   @default("{}") // JSON blob keyed by CustomFieldDefinition.id
+  tags            String   @default("[]") // JSON array of strings
+  assigneeId      String?
+  createdAt       DateTime @default(now())
+
+  notes           Note[]
+  taskReminders   TaskReminder[]
+  activityEntries ActivityLogEntry[]
+  payments        Payment[]
+}
+
+model Note {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id])
+  authorId      String?
+  author        TeamMember? @relation(fields: [authorId], references: [id])
+  body          String
+  createdAt     DateTime    @default(now())
+}
+
+model TaskReminder {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id])
+  title         String
+  dueAt         DateTime
+  assigneeId    String?
+  done          Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+}
+
+model ActivityLogEntry {
+  id            String       @id @default(cuid())
+  accountId     String
+  account       Account      @relation(fields: [accountId], references: [id])
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
+  actorId       String?
+  actor         TeamMember?  @relation(fields: [actorId], references: [id])
+  type          String // MOVED_STAGE | CREATED | UPDATED | WEBHOOK_IN | CALL_LOGGED | NOTE_ADDED
+  message       String
+  createdAt     DateTime     @default(now())
+}
+
+model CustomFieldDefinition {
+  id         String   @id @default(cuid())
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id])
+  name       String
+  type       String // TEXT|LONG_TEXT|NUMBER|DATE|SELECT|MULTISELECT|EMAIL|PHONE|URL|CHECKBOX
+  section    String   @default("Általános")
+  options    String   @default("[]") // JSON array, for SELECT/MULTISELECT
+  order      Int      @default(0)
+}
+
+model Webhook {
+  id         String   @id @default(cuid())
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id])
+  stageId    String
+  stage      Stage    @relation(fields: [stageId], references: [id])
+  accountId  String
+  name       String
+  token      String   @unique @default(cuid())
+  createdAt  DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Task management
+// ---------------------------------------------------------------------------
+
+model Task {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  accountId      String?
+  account        Account?     @relation(fields: [accountId], references: [id])
+
+  title         String
+  description   String?
+  category      String      @default("Egyéb") // Sikertelen fizetés, Felhívni, Kreatív, Hirdetésszöveg, Landing, Összeállítás...
+  priority      String      @default("MEDIUM") // LOW|MEDIUM|HIGH|URGENT
+  dueAt         DateTime?
+  assigneeId    String?
+  assignee      TeamMember? @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  statusColumn  String      @default("ASSIGNED") // ASSIGNED|WAITING|DAY_ONE|DAY_TWO|DAY_THREE|BLOCKED
+  autoGenerated Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Approvals
+// ---------------------------------------------------------------------------
+
+model ApprovalItem {
+  id          String      @id @default(cuid())
+  accountId   String
+  account     Account     @relation(fields: [accountId], references: [id])
+  type        String // CREATIVE|LANDING|AD_COPY|IMAGE
+  title       String
+  status      String      @default("PENDING_INTERNAL") // DRAFT|PENDING_INTERNAL|PENDING_CLIENT|APPROVED|REJECTED
+  fileUrl     String?
+  clientNote  String?
+  createdById String?
+  createdBy   TeamMember? @relation("ApprovalCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
+  decidedAt   DateTime?
+}
+
+// ---------------------------------------------------------------------------
+// Payments, contracts, reports
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id               String       @id @default(cuid())
+  accountId        String
+  account          Account      @relation(fields: [accountId], references: [id])
+  opportunityId    String?
+  opportunity      Opportunity? @relation(fields: [opportunityId], references: [id])
+  amount           Float
+  type             String       @default("ONE_TIME") // ONE_TIME|MONTHLY|DEPOSIT
+  status           String       @default("CREATED") // CREATED|SENT|PAID|EXPIRED|PENDING
+  dueDate          DateTime?
+  paymentLink      String?
+  depositRemaining Float?
+  createdAt        DateTime     @default(now())
+}
+
+model Contract {
+  id           String    @id @default(cuid())
+  accountId    String
+  account      Account   @relation(fields: [accountId], references: [id])
+  status       String    @default("DRAFT") // DRAFT|SENT|VIEWED|SIGNED
+  amount       Float
+  templateName String    @default("Alap szolgáltatási szerződés")
+  documentUrl  String?
+  createdAt    DateTime  @default(now())
+  signedAt     DateTime?
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  period      String   @default("WEEK") // WEEK|MONTH
+  generatedAt DateTime @default(now())
+  isAutomatic Boolean  @default(true)
+  metrics     String   @default("{}") // JSON: spend, conversions, roas, impressions, clicks
+  shareToken  String   @unique @default(cuid())
+}
+
+// ---------------------------------------------------------------------------
+// Communication
+// ---------------------------------------------------------------------------
+
+model Conversation {
+  id        String    @id @default(cuid())
+  accountId String    @unique
+  account   Account   @relation(fields: [accountId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id])
+  senderType      String // STAFF | CLIENT
+  staffId         String?
+  staff           TeamMember?  @relation("StaffMessages", fields: [staffId], references: [id])
+  clientContactId String?
+  clientContact   Contact?     @relation("ClientMessages", fields: [clientContactId], references: [id])
+  body            String
+  attachmentUrl   String?
+  createdAt       DateTime     @default(now())
+}
+
+model FileAsset {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id])
+  folder     String   @default("IMAGES") // IMAGES|VIDEOS|OTHER
+  fileName   String
+  fileUrl    String
+  fileType   String   @default("image")
+  uploadedAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Calendar
+// ---------------------------------------------------------------------------
+
+model CalendarEvent {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  accountId      String?
+  account        Account?     @relation(fields: [accountId], references: [id])
+  teamMemberId   String?
+  teamMember     TeamMember?  @relation(fields: [teamMemberId], references: [id])
+  contactId      String?
+  contact        Contact?     @relation(fields: [contactId], references: [id])
+  type           String       @default("CONVERSATION") // STRATEGY_CALL|ONBOARDING|CONVERSATION
+  title          String
+  startAt        DateTime
+  endAt          DateTime
+  meetLink       String?
+  createdAt      DateTime     @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Ads / metrics
+// ---------------------------------------------------------------------------
+
+model AdMetricSnapshot {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  date        DateTime
+  spend       Float    @default(0)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  leads       Int      @default(0)
+
+  @@index([accountId, date])
+}
+
+model Credential {
+  id             String   @id @default(cuid())
+  accountId      String
+  account        Account  @relation(fields: [accountId], references: [id])
+  label          String
+  value          String
+  isConfidential Boolean  @default(true)
+  createdAt      DateTime @default(now())
+}
