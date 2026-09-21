@@ -5,7 +5,7 @@ import { PageHeader, Card, Badge } from "@/components/ui";
 export default async function AffiliatePage() {
   const accountId = (await getEffectiveAccountId())!;
   const account = await prisma.account.findUnique({ where: { id: accountId } });
-  const referralCode = `SYNK-${accountId.slice(0, 6).toUpperCase()}`;
+  const referralCode = `THECODE-${accountId.slice(0, 6).toUpperCase()}`;
 
   return (
     <div>

@@ -1,6 +1,6 @@
-# Synk AI CRM
+# The Code CRM
 
-Multi-tenant ügynökségi CRM + fehér-címkés ügyfélportál, a `Synk AI CRM – Rendszerspecifikáció Claude Code-hoz` dokumentum alapján felépítve.
+Multi-tenant ügynökségi CRM + fehér-címkés ügyfélportál, a `The Code CRM – Rendszerspecifikáció Claude Code-hoz` dokumentum alapján felépítve.
 
 ## Tech stack
 
@@ -24,11 +24,11 @@ Nyisd meg: http://localhost:3000
 
 | Felület | URL | Email | Jelszó |
 |---|---|---|---|
-| Belső (Service/Sales admin) | `/login` | `admin@synkai.hu` | `synkai123` |
-| Belső (CSM) | `/login` | `csm@synkai.hu` | `synkai123` |
+| Belső (Service/Sales admin) | `/login` | `admin@thecode.hu` | `thecode123` |
+| Belső (CSM) | `/login` | `csm@thecode.hu` | `thecode123` |
 | Ügyfélportál | `/portal/login` | `kapcsolat@zoldkert.hu` | `ugyfel123` |
 
-Minden csapattag jelszava `synkai123`, minden ügyfél elsődleges kontaktjáé `ugyfel123` (lásd `prisma/seed.ts`).
+Minden csapattag jelszava `thecode123`, minden ügyfél elsődleges kontaktjáé `ugyfel123` (lásd `prisma/seed.ts`).
 
 Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyithatod ("nézd, amit ő lát" impersonáció) – a sárga sáv "Vissza a saját főoldalra" gombjával lépsz ki belőle.
 
@@ -48,9 +48,9 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
 Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session nem rendelkezik:
 
 - **Meta Ads / Conversion API** – az adatmodell és a UI megvan (`AdMetricSnapshot`, feature flagek), de a tényleges Meta OAuth és a live metrika-húzás helyén egy jól látható "fejlesztés alatt" panel van
-- **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/synk-xxxxxx`)
+- **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/thecode-xxxxxx`)
 - **AI Creative / Winner Ads / Kreatív sablonok** – csak stub oldal, mert valós kép/szöveg-generáló LLM-hívást igényelnének
-- **Synk AI asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
+- **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
 - **Fizetési szolgáltató (Stripe/Barion/SimplePay)** – a `Payment` modell és a UI kész, de a "fizetési link" egy generált placeholder URL, nincs mögötte valós fizetési folyamat
 - **PWA telepítés** – nincs `manifest.json` / service worker még
 

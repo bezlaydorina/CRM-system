@@ -36,7 +36,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Synk AI Zrt. – ügynökségi áttekintés" />
+      <PageHeader title="Dashboard" subtitle="The Code Zrt. – ügynökségi áttekintés" />
 
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <Card>

@@ -11,7 +11,7 @@ export default async function SalesPaymentsPage() {
 
   return (
     <div>
-      <PageHeader title="Sales · Payments" subtitle="Synk AI Zrt. saját fizetési linkjei a prospektek felé" />
+      <PageHeader title="Sales · Payments" subtitle="The Code Zrt. saját fizetési linkjei a prospektek felé" />
       <PaymentsTable payments={payments} />
     </div>
   );

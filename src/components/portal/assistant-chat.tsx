@@ -34,7 +34,7 @@ export function AssistantChat() {
             </div>
           </div>
         ))}
-        {pending ? <p className="text-xs text-zinc-400">Synk AI gondolkozik...</p> : null}
+        {pending ? <p className="text-xs text-zinc-400">The Code gondolkozik...</p> : null}
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">

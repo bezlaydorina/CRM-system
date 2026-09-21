@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export function MilestoneCelebration({ accountId }: { accountId: string }) {
   const [show, setShow] = useState(false);
-  const key = `synk_milestone_ads_live_${accountId}`;
+  const key = `thecode_milestone_ads_live_${accountId}`;
 
   useEffect(() => {
     try {
@@ -35,7 +35,7 @@ export function MilestoneCelebration({ accountId }: { accountId: string }) {
               style={{
                 left: `${(i * 41) % 100}%`,
                 backgroundColor: ["#6366f1", "#22c55e", "#f59e0b", "#ec4899"][i % 4],
-                animation: `synk-confetti 1.4s ease-in ${i * 0.04}s forwards`,
+                animation: `thecode-confetti 1.4s ease-in ${i * 0.04}s forwards`,
               }}
             />
           ))}
@@ -51,7 +51,7 @@ export function MilestoneCelebration({ accountId }: { accountId: string }) {
         </button>
       </div>
       <style>{`
-        @keyframes synk-confetti {
+        @keyframes thecode-confetti {
           from { transform: translateY(-10px) rotate(0deg); opacity: 1; }
           to { transform: translateY(260px) rotate(360deg); opacity: 0; }
         }

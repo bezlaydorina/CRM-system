@@ -12,7 +12,7 @@ export default async function SharedReportPage({ params }: { params: Promise<{ t
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-100 p-6">
       <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-xl">
-        <p className="text-xs font-medium uppercase text-emerald-600">Synk AI riport</p>
+        <p className="text-xs font-medium uppercase text-emerald-600">The Code riport</p>
         <h1 className="mt-1 text-xl font-semibold text-zinc-900">{report.account.name}</h1>
         <p className="text-sm text-zinc-500">{report.generatedAt.toLocaleDateString("hu-HU")} · {report.period === "WEEK" ? "Heti" : "Havi"} riport</p>
         <div className="mt-6 grid grid-cols-2 gap-4">

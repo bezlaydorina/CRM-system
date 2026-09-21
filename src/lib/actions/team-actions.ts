@@ -13,7 +13,7 @@ export async function createTeamMemberAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!name || !email) return;
 
-  const passwordHash = await hashPassword("synkai123");
+  const passwordHash = await hashPassword("thecode123");
   await prisma.teamMember.create({
     data: {
       organizationId: session.organizationId,

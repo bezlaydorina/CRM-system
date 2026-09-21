@@ -19,8 +19,8 @@ export type ClientSession = {
 
 export type Session = StaffSession | ClientSession;
 
-const SESSION_COOKIE = "synk_session";
-const IMPERSONATION_COOKIE = "synk_impersonate_account_id";
+const SESSION_COOKIE = "thecode_session";
+const IMPERSONATION_COOKIE = "thecode_impersonate_account_id";
 
 async function sign(payload: Session) {
   return new SignJWT(payload as unknown as Record<string, unknown>)

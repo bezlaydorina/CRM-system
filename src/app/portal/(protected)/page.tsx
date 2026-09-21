@@ -77,7 +77,7 @@ export default async function PortalHomePage({ searchParams }: { searchParams: P
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <QuickLink href="/portal/riportok" title="Riportok" desc="Heti automata riportok" />
         <QuickLink href="/portal/jovahagyasok" title="Kreatívok" desc="Jóváhagyásra váró anyagok" />
-        <QuickLink href="/portal/uzenetek" title="Üzenetek" desc="Chat a Synk AI csapattal" />
+        <QuickLink href="/portal/uzenetek" title="Üzenetek" desc="Chat a The Code csapattal" />
       </div>
     </div>
   );

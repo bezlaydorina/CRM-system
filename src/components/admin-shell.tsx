@@ -42,9 +42,9 @@ export function AdminShell({
     <div className="flex min-h-screen w-full bg-zinc-100">
       <aside className="flex w-64 flex-shrink-0 flex-col bg-indigo-950 text-white">
         <div className="flex items-center gap-2 px-4 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm font-bold">S</div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm font-bold">T</div>
           <div>
-            <p className="text-sm font-semibold leading-tight">Synk AI</p>
+            <p className="text-sm font-semibold leading-tight">The Code</p>
             <p className="text-[11px] text-indigo-300 leading-tight">Admin felület</p>
           </div>
         </div>

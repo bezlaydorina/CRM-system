@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Synk AI CRM",
-  description: "Synk AI ügynökségi CRM és ügyfélportál",
+  title: "The Code CRM",
+  description: "The Code ügynökségi CRM és ügyfélportál",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -13,7 +13,7 @@ export default async function ClientLoginPage({
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-lg font-bold text-white">
-            S
+            T
           </div>
           <h1 className="text-xl font-semibold text-zinc-900">Ügyfélportál</h1>
           <p className="mt-1 text-sm text-zinc-500">Jelentkezz be a saját fiókodba</p>
@@ -52,7 +52,7 @@ export default async function ClientLoginPage({
           </button>
         </form>
         <p className="mt-6 text-center text-xs text-zinc-400">
-          Synk AI csapattag vagy? <Link href="/login" className="text-emerald-600 hover:underline">Belső bejelentkezés</Link>
+          The Code csapattag vagy? <Link href="/login" className="text-emerald-600 hover:underline">Belső bejelentkezés</Link>
         </p>
       </div>
     </div>

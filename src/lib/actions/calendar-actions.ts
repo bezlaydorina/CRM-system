@@ -24,7 +24,7 @@ export async function createCalendarEventAction(formData: FormData) {
       title,
       startAt,
       endAt,
-      meetLink: teamMember?.googleCalendarConnected ? `https://meet.google.com/synk-${Math.random().toString(36).slice(2, 8)}` : null,
+      meetLink: teamMember?.googleCalendarConnected ? `https://meet.google.com/thecode-${Math.random().toString(36).slice(2, 8)}` : null,
     },
   });
   revalidatePath("/admin/naptar");

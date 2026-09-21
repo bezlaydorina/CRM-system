@@ -33,36 +33,36 @@ function pick<T>(arr: readonly T[], i: number): T {
 }
 
 async function main() {
-  console.log("Seeding Synk AI CRM demo data...");
+  console.log("Seeding The Code CRM demo data...");
 
-  const org = await prisma.organization.create({ data: { name: "Synk AI Zrt." } });
+  const org = await prisma.organization.create({ data: { name: "The Code Zrt." } });
 
-  const pw = await hashPassword("synkai123");
+  const pw = await hashPassword("thecode123");
   const clientPw = await hashPassword("ugyfel123");
 
   const [, csm1, csm2, closer, setter, copywriter, designer, lpBuilder, ppc, salesRep] = await Promise.all([
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Nagy Admin", email: "admin@synkai.hu", passwordHash: pw, jobRole: "Admin", systemRole: "ADMIN", avatarColor: "#6366f1" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Kovács Dóra", email: "csm@synkai.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#0ea5e9", googleCalendarConnected: true } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Papp Réka", email: "csm2@synkai.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#14b8a6" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Kérészy Levente", email: "closer@synkai.hu", passwordHash: pw, jobRole: "Closer", avatarColor: "#f59e0b", googleCalendarConnected: true } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Szűcs Bence", email: "setter@synkai.hu", passwordHash: pw, jobRole: "Setter", avatarColor: "#8b5cf6" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Fekete Anna", email: "copy@synkai.hu", passwordHash: pw, jobRole: "Szövegíró", avatarColor: "#ec4899" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Dávid Mirella", email: "grafikus@synkai.hu", passwordHash: pw, jobRole: "Grafikus", avatarColor: "#f43f5e" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Simon Zoltán", email: "lp@synkai.hu", passwordHash: pw, jobRole: "LP Építő", avatarColor: "#22c55e" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Tóth Marcell", email: "ppc@synkai.hu", passwordHash: pw, jobRole: "PPC Specialista", avatarColor: "#3b82f6", googleCalendarConnected: true } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Vincze Petra", email: "sales@synkai.hu", passwordHash: pw, jobRole: "Értékesítő", avatarColor: "#eab308" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Nagy Admin", email: "admin@thecode.hu", passwordHash: pw, jobRole: "Admin", systemRole: "ADMIN", avatarColor: "#6366f1" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Kovács Dóra", email: "csm@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#0ea5e9", googleCalendarConnected: true } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Papp Réka", email: "csm2@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#14b8a6" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Kérészy Levente", email: "closer@thecode.hu", passwordHash: pw, jobRole: "Closer", avatarColor: "#f59e0b", googleCalendarConnected: true } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Szűcs Bence", email: "setter@thecode.hu", passwordHash: pw, jobRole: "Setter", avatarColor: "#8b5cf6" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Fekete Anna", email: "copy@thecode.hu", passwordHash: pw, jobRole: "Szövegíró", avatarColor: "#ec4899" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Dávid Mirella", email: "grafikus@thecode.hu", passwordHash: pw, jobRole: "Grafikus", avatarColor: "#f43f5e" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Simon Zoltán", email: "lp@thecode.hu", passwordHash: pw, jobRole: "LP Építő", avatarColor: "#22c55e" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Tóth Marcell", email: "ppc@thecode.hu", passwordHash: pw, jobRole: "PPC Specialista", avatarColor: "#3b82f6", googleCalendarConnected: true } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Vincze Petra", email: "sales@thecode.hu", passwordHash: pw, jobRole: "Értékesítő", avatarColor: "#eab308" } }),
   ]);
 
   const staffPool = [csm1, csm2, closer, setter, copywriter, designer, lpBuilder, ppc, salesRep];
 
   // ---------------------------------------------------------------------
-  // Internal sales "account" - Synk AI's own prospect -> paying customer
+  // Internal sales "account" - The Code's own prospect -> paying customer
   // pipeline, shown under the Sales admin tab.
   // ---------------------------------------------------------------------
   const salesAccount = await prisma.account.create({
     data: {
       organizationId: org.id,
-      name: "Synk AI - Belső Sales",
+      name: "The Code - Belső Sales",
       status: "ACTIVE",
       isInternalSales: true,
       lifecycleStage: "ADS_LIVE",
@@ -80,7 +80,7 @@ async function main() {
         email: `prospekt${i}@example.com`,
         phone: `+36301234${(500 + i).toString().slice(-3)}`,
         company: `Prospekt ${i + 1} Kft.`,
-        opportunityName: `Synk AI csomag ajánlat #${i + 1}`,
+        opportunityName: `The Code csomag ajánlat #${i + 1}`,
         status: stage.name === "Megnyert" ? "WON" : stage.name === "Elveszett" ? "LOST" : "OPEN",
         value: 150000 + i * 25000,
         source: pick(SOURCES, i),
@@ -298,9 +298,9 @@ async function main() {
     }
 
     // Payments + contracts
-    await prisma.payment.create({ data: { accountId: account.id, amount: spec.setupFee, type: "ONE_TIME", status: spec.contractSigned ? "PAID" : "SENT", dueDate: daysAgo(spec.daysInStage + 5), paymentLink: `https://pay.synkai.hu/${account.id.slice(0, 8)}-setup` } });
+    await prisma.payment.create({ data: { accountId: account.id, amount: spec.setupFee, type: "ONE_TIME", status: spec.contractSigned ? "PAID" : "SENT", dueDate: daysAgo(spec.daysInStage + 5), paymentLink: `https://pay.thecode.hu/${account.id.slice(0, 8)}-setup` } });
     if (spec.adsLive) {
-      await prisma.payment.create({ data: { accountId: account.id, amount: spec.monthlyFee, type: "MONTHLY", status: spec.lastPaymentDaysAgo != null && spec.lastPaymentDaysAgo < 35 ? "PAID" : "EXPIRED", dueDate: daysAgo(spec.lastPaymentDaysAgo ?? 0), paymentLink: `https://pay.synkai.hu/${account.id.slice(0, 8)}-monthly` } });
+      await prisma.payment.create({ data: { accountId: account.id, amount: spec.monthlyFee, type: "MONTHLY", status: spec.lastPaymentDaysAgo != null && spec.lastPaymentDaysAgo < 35 ? "PAID" : "EXPIRED", dueDate: daysAgo(spec.lastPaymentDaysAgo ?? 0), paymentLink: `https://pay.thecode.hu/${account.id.slice(0, 8)}-monthly` } });
     }
     await prisma.contract.create({
       data: {
@@ -361,7 +361,7 @@ async function main() {
   }
 
   console.log(`Seed kész: ${specs.length + 1} account, ${staffPool.length + 1} csapattag.`);
-  console.log("Belső belépés: admin@synkai.hu / synkai123");
+  console.log("Belső belépés: admin@thecode.hu / thecode123");
   console.log("Ügyfélportál belépés: kapcsolat@zoldkert.hu / ugyfel123");
 }
 

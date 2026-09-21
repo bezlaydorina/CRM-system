@@ -13,9 +13,9 @@ export default async function StaffLoginPage({
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white">
-            S
+            T
           </div>
-          <h1 className="text-xl font-semibold text-zinc-900">Synk AI &middot; Belső bejelentkezés</h1>
+          <h1 className="text-xl font-semibold text-zinc-900">The Code &middot; Belső bejelentkezés</h1>
           <p className="mt-1 text-sm text-zinc-500">Csapattagoknak (Admin, CSM, Sales, Grafikus, PPC)</p>
         </div>
         {error ? (
@@ -30,7 +30,7 @@ export default async function StaffLoginPage({
               name="email"
               type="email"
               required
-              defaultValue="admin@synkai.hu"
+              defaultValue="admin@thecode.hu"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />
           </label>
@@ -40,7 +40,7 @@ export default async function StaffLoginPage({
               name="password"
               type="password"
               required
-              defaultValue="synkai123"
+              defaultValue="thecode123"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />
           </label>

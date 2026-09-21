@@ -23,7 +23,7 @@ export default async function SalesDashboardPage() {
 
   return (
     <div>
-      <PageHeader title="Sales dashboard" subtitle="Synk AI Zrt. saját prospekt → ügyfél pipeline-ja" />
+      <PageHeader title="Sales dashboard" subtitle="The Code Zrt. saját prospekt → ügyfél pipeline-ja" />
       <div className="mb-4 grid grid-cols-3 gap-4">
         <Card>
           <p className="text-xs text-zinc-500">Nyitott prospektek</p>

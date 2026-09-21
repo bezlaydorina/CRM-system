@@ -30,7 +30,7 @@ export function PortalShell({
           <NavLink href="/portal" exact>
             Kezdőlap
           </NavLink>
-          <NavLink href="/portal/asszisztens">Synk AI asszisztens</NavLink>
+          <NavLink href="/portal/asszisztens">The Code asszisztens</NavLink>
           <NavLink href="/portal/riportok">Riportok</NavLink>
           <NavLink href="/portal/jovahagyasok">Jóváhagyások</NavLink>
           <NavLink href="/portal/uzenetek">Üzenetek</NavLink>

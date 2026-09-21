@@ -11,7 +11,7 @@ export default async function SalesContractsPage() {
 
   return (
     <div>
-      <PageHeader title="Sales · Szerződések" subtitle="Synk AI Zrt. saját aláírt szerződései" />
+      <PageHeader title="Sales · Szerződések" subtitle="The Code Zrt. saját aláírt szerződései" />
       <ContractsTable contracts={contracts} />
     </div>
   );

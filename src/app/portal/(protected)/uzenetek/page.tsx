@@ -12,7 +12,7 @@ export default async function PortalMessagesPage() {
 
   return (
     <div>
-      <PageHeader title="Üzenetek" subtitle="Synk AI csapat · online" />
+      <PageHeader title="Üzenetek" subtitle="The Code csapat · online" />
       <Card className="flex h-[65vh] flex-col">
         <div className="flex-1 space-y-3 overflow-y-auto p-2">
           {conversation?.messages.map((m) => (
@@ -20,7 +20,7 @@ export default async function PortalMessagesPage() {
               <div className={`max-w-sm rounded-2xl px-3 py-2 text-sm ${m.senderType === "CLIENT" ? "bg-emerald-600 text-white" : "bg-zinc-100 text-zinc-800"}`}>
                 <p>{m.body}</p>
                 <p className={`mt-1 text-[10px] ${m.senderType === "CLIENT" ? "text-emerald-100" : "text-zinc-400"}`}>
-                  {m.senderType === "CLIENT" ? m.clientContact?.fullName : m.staff?.name ?? "Synk AI csapat"} ·{" "}
+                  {m.senderType === "CLIENT" ? m.clientContact?.fullName : m.staff?.name ?? "The Code csapat"} ·{" "}
                   {m.createdAt.toLocaleTimeString("hu-HU", { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
