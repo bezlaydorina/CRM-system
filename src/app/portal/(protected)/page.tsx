@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
 import { Card } from "@/components/ui";
-import { formatHUF } from "@/lib/enums";
+import { formatHUF, isAccountLive } from "@/lib/enums";
 import { MilestoneCelebration } from "@/components/portal/milestone-celebration";
 import { subDays } from "date-fns";
 
@@ -36,7 +36,7 @@ export default async function PortalHomePage({ searchParams }: { searchParams: P
 
   return (
     <div>
-      {account.adsLive ? <MilestoneCelebration accountId={account.id} /> : null}
+      {isAccountLive(account.lifecycleStage) ? <MilestoneCelebration accountId={account.id} /> : null}
 
       <h1 className="text-xl font-semibold text-zinc-900">Szép napot, {primaryContact?.fullName.split(" ")[0] ?? "!"}!</h1>
       <p className="mt-1 text-sm text-zinc-500">{account.name}</p>

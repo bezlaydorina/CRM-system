@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId, getSession } from "@/lib/auth";
 import { PageHeader, Card, Badge } from "@/components/ui";
+import { isAccountLive } from "@/lib/enums";
 import {
   updateOwnProfileAction,
   invitePortalTeammateAction,
@@ -89,7 +90,7 @@ export default async function PortalSettingsPage() {
 
         <Card className="lg:col-span-2">
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Meta hirdetési fiók</h2>
-          {account?.adsLive ? <Badge color="green">Csatlakoztatva (demó adat)</Badge> : <Badge color="gray">Nincs csatlakoztatva</Badge>}
+          {isAccountLive(account?.lifecycleStage ?? "") ? <Badge color="green">Csatlakoztatva (demó adat)</Badge> : <Badge color="gray">Nincs csatlakoztatva</Badge>}
         </Card>
       </div>
     </div>

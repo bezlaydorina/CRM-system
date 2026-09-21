@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, PageHeader, Badge, Avatar } from "@/components/ui";
-import { formatHUF, lifecycleLabel, labelFor, TASK_PRIORITIES } from "@/lib/enums";
+import { formatHUF, lifecycleLabel, labelFor, TASK_PRIORITIES, isAccountLive } from "@/lib/enums";
 import { hoursAgo, daysSince } from "@/lib/date-helpers";
 import { formatDistanceToNow } from "date-fns";
 import { hu } from "date-fns/locale";
@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   const activeAccounts = accounts.filter((a) => a.status === "ACTIVE" && !a.isTestAccount);
-  const liveAccounts = activeAccounts.filter((a) => a.adsLive);
+  const liveAccounts = activeAccounts.filter((a) => isAccountLive(a.lifecycleStage));
   const mrr = liveAccounts.reduce((sum, a) => sum + a.monthlyFee, 0);
   const stuckAccounts = activeAccounts.filter((a) => {
     const days = daysSince(a.lifecycleEnteredAt);

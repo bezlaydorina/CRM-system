@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
-import { formatHUF } from "@/lib/enums";
+import { formatHUF, isAccountLive } from "@/lib/enums";
 import { subDays } from "date-fns";
 
 /**
@@ -29,7 +29,7 @@ export async function askAssistantAction(question: string): Promise<string> {
   const leads7 = last7.reduce((s, x) => s + x.leads, 0);
 
   if (q.includes("hogy mennek") || q.includes("teljesítmény") || q.includes("hirdet")) {
-    if (!account?.adsLive) return "A hirdetéseid még nem indultak el, így nincs friss teljesítmény adat – amint elindulnak, itt azonnal látni fogod az eredményeket.";
+    if (!isAccountLive(account?.lifecycleStage ?? "")) return "A hirdetéseid még nem indultak el, így nincs friss teljesítmény adat – amint elindulnak, itt azonnal látni fogod az eredményeket.";
     return `Az elmúlt 7 napban ${formatHUF(spend7)} költés mellett ${leads7} lead érkezett. Ez alapban jó irányban áll, ha kérdésed van egy adott kampányról, kérdezz rá konkrétan!`;
   }
 

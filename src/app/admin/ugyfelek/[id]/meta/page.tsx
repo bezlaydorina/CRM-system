@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, Badge, StubNotice } from "@/components/ui";
 import { updateFeatureFlagsAction } from "@/lib/actions/account-actions";
+import { isAccountLive } from "@/lib/enums";
 
 export default async function AccountMetaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,7 +26,7 @@ export default async function AccountMetaPage({ params }: { params: Promise<{ id
       <Card>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-700">Meta hirdetési fiók</h2>
-          {account.adsLive ? <Badge color="green">Csatlakoztatva (demó)</Badge> : <Badge color="gray">Nincs csatlakoztatva</Badge>}
+          {isAccountLive(account.lifecycleStage) ? <Badge color="green">Csatlakoztatva (demó)</Badge> : <Badge color="gray">Nincs csatlakoztatva</Badge>}
         </div>
         <p className="mb-3 text-xs text-zinc-500">
           Fiók, oldal, Instagram, Pixel és fizetési mód kiválasztása – valós OAuth varázsló Meta App-hoz kötött API

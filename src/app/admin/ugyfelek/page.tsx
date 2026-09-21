@@ -132,7 +132,6 @@ export default async function UgyfelekPage({
                 <th className="px-4 py-2">Iparág</th>
                 <th className="px-4 py-2">Szakasz</th>
                 <th className="px-4 py-2">Havi díj</th>
-                <th className="px-4 py-2">Hirdetés</th>
                 <th className="px-4 py-2">CSM</th>
               </tr>
             </thead>
@@ -151,7 +150,6 @@ export default async function UgyfelekPage({
                       <Badge color="indigo">{ACCOUNT_LIFECYCLE_STAGES.find((s) => s.key === a.lifecycleStage)?.label}</Badge>
                     </td>
                     <td className="px-4 py-2">{formatHUF(a.monthlyFee)}</td>
-                    <td className="px-4 py-2">{a.adsLive ? <Badge color="green">Fut</Badge> : <Badge color="gray">Nem</Badge>}</td>
                     <td className="px-4 py-2 text-zinc-500">{csm?.name ?? "—"}</td>
                   </tr>
                 );

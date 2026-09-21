@@ -22,17 +22,12 @@ export function lifecycleLabel(key: string) {
   return ACCOUNT_LIFECYCLE_STAGES.find((s) => s.key === key)?.label ?? key;
 }
 
-export const TEAM_ROLES = [
-  "Admin",
-  "CSM",
-  "Closer",
-  "Setter",
-  "Szövegíró",
-  "Fejlesztő",
-  "LP Építő",
-  "PPC Specialista",
-  "Értékesítő",
-] as const;
+/** Whether an account is in an actively-running engagement stage. */
+export function isAccountLive(lifecycleStage: string) {
+  return lifecycleStage === "ADS_LIVE" || lifecycleStage === "RETAINED";
+}
+
+export const TEAM_ROLES = ["Admin", "CSM", "Closer", "Setter", "Fejlesztő", "Értékesítő"] as const;
 
 export const CUSTOM_FIELD_TYPES = [
   { key: "TEXT", label: "Szöveg" },

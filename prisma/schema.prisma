@@ -35,7 +35,7 @@ model TeamMember {
   phone                   String?
   passwordHash            String
   avatarColor             String       @default("#6366f1")
-  jobRole                 String // Admin, CSM, Closer, Setter, Szövegíró, Fejlesztő, LP Építő, PPC Specialista, Értékesítő
+  jobRole                 String // Admin, CSM, Closer, Setter, Fejlesztő, Értékesítő
   systemRole              String       @default("STAFF") // ADMIN | STAFF
   googleCalendarConnected Boolean      @default(false)
   createdAt               DateTime     @default(now())
@@ -68,9 +68,7 @@ model Account {
 
   monthlyFee       Float     @default(0)
   setupFee         Float     @default(0)
-  monthlyAdBudget  Float     @default(0)
   startDate        DateTime?
-  adsLive          Boolean   @default(false)
   contractSignedAt DateTime?
   lastPaymentAt    DateTime?
   source           String?
@@ -126,7 +124,7 @@ model TeamAssignment {
   account      Account    @relation(fields: [accountId], references: [id])
   teamMemberId String
   teamMember   TeamMember @relation(fields: [teamMemberId], references: [id])
-  role         String // Closer, Setter, CSM, Szövegíró, Fejlesztő, LP Építő, PPC Specialista, Admin
+  role         String // Closer, Setter, CSM, Fejlesztő, Admin
 
   @@unique([accountId, teamMemberId, role])
 }

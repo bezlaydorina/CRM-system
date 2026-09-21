@@ -16,7 +16,6 @@ export default async function AccountFinancePage({ params }: { params: Promise<{
         <form action={updateAccountDetailsAction.bind(null, id)} className="grid grid-cols-2 gap-3 text-sm">
           <Field label="Havi díj (Ft)" name="monthlyFee" defaultValue={account.monthlyFee} />
           <Field label="Setup díj (Ft)" name="setupFee" defaultValue={account.setupFee} />
-          <Field label="Havi hirdetési keret (Ft)" name="monthlyAdBudget" defaultValue={account.monthlyAdBudget} />
           <button className="col-span-2 mt-2 rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white">Mentés</button>
         </form>
       </Card>
@@ -27,7 +26,6 @@ export default async function AccountFinancePage({ params }: { params: Promise<{
           <Row label="Szerződés aláírva" value={account.contractSignedAt ? account.contractSignedAt.toLocaleDateString("hu-HU") : "Nincs aláírva"} />
           <Row label="Első/utolsó befizetés" value={account.lastPaymentAt ? account.lastPaymentAt.toLocaleDateString("hu-HU") : "—"} />
           <Row label="Kezdés" value={account.startDate ? account.startDate.toLocaleDateString("hu-HU") : "—"} />
-          <Row label="Hirdetések állapota" value={account.adsLive ? "Futnak" : "Még nem indultak"} />
           <Row label="Éves díjbázis (havi × 12)" value={formatHUF(account.monthlyFee * 12)} />
         </dl>
       </Card>

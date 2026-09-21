@@ -6,7 +6,7 @@ export async function GET() {
   await requireStaffSession();
   const accounts = await prisma.account.findMany({ where: { isInternalSales: false }, orderBy: { name: "asc" } });
 
-  const header = ["Cégnév", "Weboldal", "Iparág", "Státusz", "Életciklus", "Havi díj", "Hirdetés indult", "Forrás"];
+  const header = ["Cégnév", "Weboldal", "Iparág", "Státusz", "Életciklus", "Havi díj", "Forrás"];
   const rows = accounts.map((a) => [
     a.name,
     a.website ?? "",
@@ -14,7 +14,6 @@ export async function GET() {
     a.status,
     lifecycleLabel(a.lifecycleStage),
     String(a.monthlyFee),
-    a.adsLive ? "igen" : "nem",
     a.source ?? "",
   ]);
 

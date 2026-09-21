@@ -106,9 +106,7 @@ export default async function AccountOverviewPage({ params }: { params: Promise<
           <dl className="space-y-1.5 text-sm">
             <Row label="Weboldal" value={account.website ?? "—"} />
             <Row label="Havi díj" value={formatHUF(account.monthlyFee)} />
-            <Row label="Hirdetési keret" value={formatHUF(account.monthlyAdBudget)} />
             <Row label="Kezdés" value={account.startDate ? account.startDate.toLocaleDateString("hu-HU") : "—"} />
-            <Row label="Hirdetések indultak" value={account.adsLive ? "Igen" : "Nem"} />
             <Row label="Utolsó befizetés" value={account.lastPaymentAt ? account.lastPaymentAt.toLocaleDateString("hu-HU") : "—"} />
           </dl>
         </Card>

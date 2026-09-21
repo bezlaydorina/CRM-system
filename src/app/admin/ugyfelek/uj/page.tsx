@@ -10,10 +10,9 @@ export default function NewAccountPage() {
           <Field label="Cégnév *" name="name" required />
           <Field label="Weboldal" name="website" placeholder="https://..." />
           <Field label="Iparág" name="industry" />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Field label="Havi díj (Ft)" name="monthlyFee" type="number" />
             <Field label="Setup díj (Ft)" name="setupFee" type="number" />
-            <Field label="Havi hird. keret (Ft)" name="monthlyAdBudget" type="number" />
           </div>
           <Field label="Forrás" name="source" placeholder="facebook_lead_ads, referral, ..." />
           <button type="submit" className="mt-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">

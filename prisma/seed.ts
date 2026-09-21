@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/password";
+import { isAccountLive } from "../src/lib/enums";
 
 const prisma = new PrismaClient();
 
@@ -40,20 +41,20 @@ async function main() {
   const pw = await hashPassword("thecode123");
   const clientPw = await hashPassword("ugyfel123");
 
-  const [, csm1, csm2, closer, setter, copywriter, developer, lpBuilder, ppc, salesRep] = await Promise.all([
+  const [, csm1, csm2, closer, setter, dev2, developer, dev3, dev4, salesRep] = await Promise.all([
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Nagy Admin", email: "admin@thecode.hu", passwordHash: pw, jobRole: "Admin", systemRole: "ADMIN", avatarColor: "#6366f1" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Kovács Dóra", email: "csm@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#0ea5e9", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Papp Réka", email: "csm2@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#14b8a6" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Kérészy Levente", email: "closer@thecode.hu", passwordHash: pw, jobRole: "Closer", avatarColor: "#f59e0b", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Szűcs Bence", email: "setter@thecode.hu", passwordHash: pw, jobRole: "Setter", avatarColor: "#8b5cf6" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Fekete Anna", email: "copy@thecode.hu", passwordHash: pw, jobRole: "Szövegíró", avatarColor: "#ec4899" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Fekete Anna", email: "dev2@thecode.hu", passwordHash: pw, jobRole: "Fejlesztő", avatarColor: "#ec4899" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Dávid Mirella", email: "fejleszto@thecode.hu", passwordHash: pw, jobRole: "Fejlesztő", avatarColor: "#f43f5e" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Simon Zoltán", email: "lp@thecode.hu", passwordHash: pw, jobRole: "LP Építő", avatarColor: "#22c55e" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Tóth Marcell", email: "ppc@thecode.hu", passwordHash: pw, jobRole: "PPC Specialista", avatarColor: "#3b82f6", googleCalendarConnected: true } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Simon Zoltán", email: "dev3@thecode.hu", passwordHash: pw, jobRole: "Fejlesztő", avatarColor: "#22c55e" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Tóth Marcell", email: "dev4@thecode.hu", passwordHash: pw, jobRole: "Fejlesztő", avatarColor: "#3b82f6", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Vincze Petra", email: "sales@thecode.hu", passwordHash: pw, jobRole: "Értékesítő", avatarColor: "#eab308" } }),
   ]);
 
-  const staffPool = [csm1, csm2, closer, setter, copywriter, developer, lpBuilder, ppc, salesRep];
+  const staffPool = [csm1, csm2, closer, setter, dev2, developer, dev3, dev4, salesRep];
 
   // ---------------------------------------------------------------------
   // Internal sales "account" - The Code's own prospect -> paying customer
@@ -99,8 +100,6 @@ async function main() {
     daysInStage: number;
     monthlyFee: number;
     setupFee: number;
-    monthlyAdBudget: number;
-    adsLive: boolean;
     contractSigned: boolean;
     lastPaymentDaysAgo: number | null;
     isTestAccount?: boolean;
@@ -108,19 +107,19 @@ async function main() {
   };
 
   const specs: AccountSpec[] = [
-    { name: "Zöld Kert Kft.", website: "zoldkert.hu", industry: "Kertészet", stage: "RETAINED", daysInStage: 62, monthlyFee: 180000, setupFee: 150000, monthlyAdBudget: 300000, adsLive: true, contractSigned: true, lastPaymentDaysAgo: 3 },
-    { name: "Aurora Bútor Kft.", website: "aurorabutor.hu", industry: "Lakberendezés", stage: "ADS_LIVE", daysInStage: 9, monthlyFee: 220000, setupFee: 180000, monthlyAdBudget: 450000, adsLive: true, contractSigned: true, lastPaymentDaysAgo: 12 },
-    { name: "Napfény Fogászat", website: "napfenyfogaszat.hu", industry: "Egészségügy", stage: "CSM_CONTACT", daysInStage: 2, monthlyFee: 160000, setupFee: 120000, monthlyAdBudget: 200000, adsLive: false, contractSigned: false, lastPaymentDaysAgo: null },
-    { name: "Kristály Ékszer", website: "kristalyekszer.hu", industry: "Kereskedelem", stage: "MEETING", daysInStage: 5, monthlyFee: 140000, setupFee: 100000, monthlyAdBudget: 180000, adsLive: false, contractSigned: false, lastPaymentDaysAgo: null },
-    { name: "Prémium Autó Bérlés", website: "premiumautoberles.hu", industry: "Autókölcsönzés", stage: "ONBOARDING_FORM", daysInStage: 4, monthlyFee: 200000, setupFee: 150000, monthlyAdBudget: 350000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 6 },
-    { name: "Balaton Apartman", website: "balatonapartman.hu", industry: "Turizmus", stage: "WAITING_IMAGES", daysInStage: 47, monthlyFee: 170000, setupFee: 130000, monthlyAdBudget: 260000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 51 },
-    { name: "FitLife Edzőterem", website: "fitlife.hu", industry: "Sport & fitnesz", stage: "LANDING_IN_PROGRESS", daysInStage: 3, monthlyFee: 150000, setupFee: 110000, monthlyAdBudget: 220000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 3 },
-    { name: "Style Studio Szépségszalon", website: "stylestudio.hu", industry: "Szépségipar", stage: "LANDING_REVIEW", daysInStage: 2, monthlyFee: 145000, setupFee: 100000, monthlyAdBudget: 190000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 4 },
-    { name: "TechFix Szerviz", website: "techfix.hu", industry: "Szolgáltatóipar", stage: "IN_REVISION", daysInStage: 6, monthlyFee: 155000, setupFee: 110000, monthlyAdBudget: 210000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 8 },
-    { name: "GreenBuild Építőipar", website: "greenbuild.hu", industry: "Építőipar", stage: "ADMIN_APPROVAL", daysInStage: 1, monthlyFee: 210000, setupFee: 160000, monthlyAdBudget: 380000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 5 },
-    { name: "Sunrise Utazási Iroda", website: "sunrise-utazas.hu", industry: "Turizmus", stage: "READY_TO_LAUNCH", daysInStage: 1, monthlyFee: 190000, setupFee: 140000, monthlyAdBudget: 300000, adsLive: false, contractSigned: true, lastPaymentDaysAgo: 2 },
-    { name: "Old Habits Kávézó", website: "oldhabits.hu", industry: "HoReCa", stage: "LOST", daysInStage: 90, monthlyFee: 130000, setupFee: 90000, monthlyAdBudget: 150000, adsLive: false, contractSigned: false, lastPaymentDaysAgo: 120, status: "ARCHIVED" },
-    { name: "Demo Teszt Fiók", website: "example.com", industry: "Teszt", stage: "ADS_LIVE", daysInStage: 15, monthlyFee: 0, setupFee: 0, monthlyAdBudget: 0, adsLive: true, contractSigned: false, lastPaymentDaysAgo: null, isTestAccount: true },
+    { name: "Zöld Kert Kft.", website: "zoldkert.hu", industry: "Kertészet", stage: "RETAINED", daysInStage: 62, monthlyFee: 180000, setupFee: 150000, contractSigned: true, lastPaymentDaysAgo: 3 },
+    { name: "Aurora Bútor Kft.", website: "aurorabutor.hu", industry: "Lakberendezés", stage: "ADS_LIVE", daysInStage: 9, monthlyFee: 220000, setupFee: 180000, contractSigned: true, lastPaymentDaysAgo: 12 },
+    { name: "Napfény Fogászat", website: "napfenyfogaszat.hu", industry: "Egészségügy", stage: "CSM_CONTACT", daysInStage: 2, monthlyFee: 160000, setupFee: 120000, contractSigned: false, lastPaymentDaysAgo: null },
+    { name: "Kristály Ékszer", website: "kristalyekszer.hu", industry: "Kereskedelem", stage: "MEETING", daysInStage: 5, monthlyFee: 140000, setupFee: 100000, contractSigned: false, lastPaymentDaysAgo: null },
+    { name: "Prémium Autó Bérlés", website: "premiumautoberles.hu", industry: "Autókölcsönzés", stage: "ONBOARDING_FORM", daysInStage: 4, monthlyFee: 200000, setupFee: 150000, contractSigned: true, lastPaymentDaysAgo: 6 },
+    { name: "Balaton Apartman", website: "balatonapartman.hu", industry: "Turizmus", stage: "WAITING_IMAGES", daysInStage: 47, monthlyFee: 170000, setupFee: 130000, contractSigned: true, lastPaymentDaysAgo: 51 },
+    { name: "FitLife Edzőterem", website: "fitlife.hu", industry: "Sport & fitnesz", stage: "LANDING_IN_PROGRESS", daysInStage: 3, monthlyFee: 150000, setupFee: 110000, contractSigned: true, lastPaymentDaysAgo: 3 },
+    { name: "Style Studio Szépségszalon", website: "stylestudio.hu", industry: "Szépségipar", stage: "LANDING_REVIEW", daysInStage: 2, monthlyFee: 145000, setupFee: 100000, contractSigned: true, lastPaymentDaysAgo: 4 },
+    { name: "TechFix Szerviz", website: "techfix.hu", industry: "Szolgáltatóipar", stage: "IN_REVISION", daysInStage: 6, monthlyFee: 155000, setupFee: 110000, contractSigned: true, lastPaymentDaysAgo: 8 },
+    { name: "GreenBuild Építőipar", website: "greenbuild.hu", industry: "Építőipar", stage: "ADMIN_APPROVAL", daysInStage: 1, monthlyFee: 210000, setupFee: 160000, contractSigned: true, lastPaymentDaysAgo: 5 },
+    { name: "Sunrise Utazási Iroda", website: "sunrise-utazas.hu", industry: "Turizmus", stage: "READY_TO_LAUNCH", daysInStage: 1, monthlyFee: 190000, setupFee: 140000, contractSigned: true, lastPaymentDaysAgo: 2 },
+    { name: "Old Habits Kávézó", website: "oldhabits.hu", industry: "HoReCa", stage: "LOST", daysInStage: 90, monthlyFee: 130000, setupFee: 90000, contractSigned: false, lastPaymentDaysAgo: 120, status: "ARCHIVED" },
+    { name: "Demo Teszt Fiók", website: "example.com", industry: "Teszt", stage: "ADS_LIVE", daysInStage: 15, monthlyFee: 0, setupFee: 0, contractSigned: false, lastPaymentDaysAgo: null, isTestAccount: true },
   ];
 
   const now = Date.now();
@@ -141,9 +140,7 @@ async function main() {
         lifecycleEnteredAt: daysAgo(spec.daysInStage),
         monthlyFee: spec.monthlyFee,
         setupFee: spec.setupFee,
-        monthlyAdBudget: spec.monthlyAdBudget,
         startDate: daysAgo(spec.daysInStage + 10),
-        adsLive: spec.adsLive,
         contractSignedAt: spec.contractSigned ? daysAgo(spec.daysInStage + 8) : null,
         lastPaymentAt: spec.lastPaymentDaysAgo != null ? daysAgo(spec.lastPaymentDaysAgo) : null,
         source: pick(SOURCES, accountIndex),
@@ -181,7 +178,6 @@ async function main() {
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: csm.id, role: "CSM" } });
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: closer.id, role: "Closer" } });
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: developer.id, role: "Fejlesztő" } });
-    await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: ppc.id, role: "PPC Specialista" } });
 
     // Pipeline + custom fields + opportunities
     const pipeline = await createPipeline(account.id);
@@ -287,21 +283,21 @@ async function main() {
         category: "Hirdetésszöveg",
         priority: "MEDIUM",
         dueAt: daysAgo(-3),
-        assigneeId: copywriter.id,
+        assigneeId: dev2.id,
         statusColumn: "WAITING",
       },
     });
 
     // Approval items
-    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyári akció – hirdetéskép v1", status: "PENDING_INTERNAL", createdById: copywriter.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
-    await prisma.approvalItem.create({ data: { accountId: account.id, type: "AD_COPY", title: "Facebook hirdetésszöveg – v2", status: "PENDING_CLIENT", createdById: copywriter.id } });
+    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyári akció – hirdetéskép v1", status: "PENDING_INTERNAL", createdById: dev2.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
+    await prisma.approvalItem.create({ data: { accountId: account.id, type: "AD_COPY", title: "Facebook hirdetésszöveg – v2", status: "PENDING_CLIENT", createdById: dev2.id } });
     if (accountIndex % 3 === 0) {
-      await prisma.approvalItem.create({ data: { accountId: account.id, type: "LANDING", title: "Landing oldal – onboarding review", status: "APPROVED", createdById: lpBuilder.id, decidedAt: daysAgo(2) } });
+      await prisma.approvalItem.create({ data: { accountId: account.id, type: "LANDING", title: "Landing oldal – onboarding review", status: "APPROVED", createdById: dev3.id, decidedAt: daysAgo(2) } });
     }
 
     // Payments + contracts
     await prisma.payment.create({ data: { accountId: account.id, amount: spec.setupFee, type: "ONE_TIME", status: spec.contractSigned ? "PAID" : "SENT", dueDate: daysAgo(spec.daysInStage + 5), paymentLink: `https://pay.thecode.hu/${account.id.slice(0, 8)}-setup` } });
-    if (spec.adsLive) {
+    if (isAccountLive(spec.stage)) {
       await prisma.payment.create({ data: { accountId: account.id, amount: spec.monthlyFee, type: "MONTHLY", status: spec.lastPaymentDaysAgo != null && spec.lastPaymentDaysAgo < 35 ? "PAID" : "EXPIRED", dueDate: daysAgo(spec.lastPaymentDaysAgo ?? 0), paymentLink: `https://pay.thecode.hu/${account.id.slice(0, 8)}-monthly` } });
     }
     await prisma.contract.create({
@@ -315,7 +311,7 @@ async function main() {
     });
 
     // Reports
-    if (spec.adsLive) {
+    if (isAccountLive(spec.stage)) {
       for (let w = 0; w < 4; w++) {
         await prisma.report.create({
           data: {
@@ -383,7 +379,7 @@ async function main() {
     for (let i = 0; i < titles.length; i++) {
       const targetAccount = pick(createdAccounts, projectCounter + i);
       const status = pick(PROJECT_STATUS_KEYS, projectCounter);
-      const assignee = pick([developer, lpBuilder, ppc, copywriter], projectCounter);
+      const assignee = pick([developer, dev2, dev3, dev4], projectCounter);
       await prisma.project.create({
         data: {
           accountId: targetAccount.id,

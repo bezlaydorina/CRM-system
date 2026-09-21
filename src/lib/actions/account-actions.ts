@@ -22,7 +22,6 @@ export async function moveAccountStage(accountId: string, newStage: string) {
       lifecycleStage: newStage,
       lifecycleEnteredAt: new Date(),
       status: newStage === "LOST" ? "ARCHIVED" : account.status,
-      adsLive: newStage === "ADS_LIVE" || newStage === "RETAINED" ? true : account.adsLive,
     },
   });
 
@@ -51,7 +50,6 @@ export async function createAccountAction(formData: FormData) {
       industry: String(formData.get("industry") ?? "") || null,
       monthlyFee: Number(formData.get("monthlyFee") ?? 0),
       setupFee: Number(formData.get("setupFee") ?? 0),
-      monthlyAdBudget: Number(formData.get("monthlyAdBudget") ?? 0),
       source: String(formData.get("source") ?? "") || null,
     },
   });
@@ -88,7 +86,7 @@ export async function updateAccountDetailsAction(accountId: string, formData: Fo
     const v = formData.get(key);
     if (v !== null) data[key] = String(v) || null;
   }
-  for (const key of ["monthlyFee", "setupFee", "monthlyAdBudget"] as const) {
+  for (const key of ["monthlyFee", "setupFee"] as const) {
     const v = formData.get(key);
     if (v !== null) data[key] = Number(v);
   }
