@@ -35,7 +35,7 @@ export async function askAssistantAction(question: string): Promise<string> {
 
   if (q.includes("legtöbbet") || q.includes("legjobb") || q.includes("kampány")) {
     return leads7 > 0
-      ? `Az utolsó 7 napban összesen ${leads7} lead érkezett ${formatHUF(spend7)} költésből – ez átlagosan ${formatHUF(leads7 ? spend7 / leads7 : 0)} / lead. Kampány-szintű bontás a Winner Ads modulban lesz elérhető.`
+      ? `Az utolsó 7 napban összesen ${leads7} lead érkezett ${formatHUF(spend7)} költésből – ez átlagosan ${formatHUF(leads7 ? spend7 / leads7 : 0)} / lead. Kampány-szintű bontás a Riportok menüpontban lesz elérhető.`
       : "Még nincs elég adat a kampányok összehasonlításához.";
   }
 

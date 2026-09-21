@@ -79,10 +79,11 @@ export function AdminShell({
               <NavLink href="/admin/fizetesek">Fizetések</NavLink>
               <NavLink href="/admin/szerzodesek">Szerződések</NavLink>
               <div className="my-2 border-t border-white/10" />
-              <NavLink href="/admin/elakadt-kreativok">Elakadt kreatívok</NavLink>
-              <NavLink href="/admin/winner-ads">Winner Ads</NavLink>
-              <NavLink href="/admin/kreativ-sablonok">Kreatív sablonok</NavLink>
-              <NavLink href="/admin/ai-creative">AI Creative</NavLink>
+              <NavLink href="/admin/projektek/weboldalak">Weboldalak</NavLink>
+              <NavLink href="/admin/projektek/webshopok">Webshopok</NavLink>
+              <NavLink href="/admin/projektek/applikaciok">Applikációk</NavLink>
+              <NavLink href="/admin/projektek/automatizaciok">Automatizációk</NavLink>
+              <NavLink href="/admin/projektek/egyedi-rendszerek">Egyedi rendszerek</NavLink>
               <div className="my-2 border-t border-white/10" />
               <NavLink href="/admin/csapat">Csapat</NavLink>
               <NavLink href="/admin/uj-ugyfelek">Új ügyfelek</NavLink>

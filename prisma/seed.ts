@@ -40,20 +40,20 @@ async function main() {
   const pw = await hashPassword("thecode123");
   const clientPw = await hashPassword("ugyfel123");
 
-  const [, csm1, csm2, closer, setter, copywriter, designer, lpBuilder, ppc, salesRep] = await Promise.all([
+  const [, csm1, csm2, closer, setter, copywriter, developer, lpBuilder, ppc, salesRep] = await Promise.all([
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Nagy Admin", email: "admin@thecode.hu", passwordHash: pw, jobRole: "Admin", systemRole: "ADMIN", avatarColor: "#6366f1" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Kovács Dóra", email: "csm@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#0ea5e9", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Papp Réka", email: "csm2@thecode.hu", passwordHash: pw, jobRole: "CSM", avatarColor: "#14b8a6" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Kérészy Levente", email: "closer@thecode.hu", passwordHash: pw, jobRole: "Closer", avatarColor: "#f59e0b", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Szűcs Bence", email: "setter@thecode.hu", passwordHash: pw, jobRole: "Setter", avatarColor: "#8b5cf6" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Fekete Anna", email: "copy@thecode.hu", passwordHash: pw, jobRole: "Szövegíró", avatarColor: "#ec4899" } }),
-    prisma.teamMember.create({ data: { organizationId: org.id, name: "Dávid Mirella", email: "grafikus@thecode.hu", passwordHash: pw, jobRole: "Grafikus", avatarColor: "#f43f5e" } }),
+    prisma.teamMember.create({ data: { organizationId: org.id, name: "Dávid Mirella", email: "fejleszto@thecode.hu", passwordHash: pw, jobRole: "Fejlesztő", avatarColor: "#f43f5e" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Simon Zoltán", email: "lp@thecode.hu", passwordHash: pw, jobRole: "LP Építő", avatarColor: "#22c55e" } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Tóth Marcell", email: "ppc@thecode.hu", passwordHash: pw, jobRole: "PPC Specialista", avatarColor: "#3b82f6", googleCalendarConnected: true } }),
     prisma.teamMember.create({ data: { organizationId: org.id, name: "Vincze Petra", email: "sales@thecode.hu", passwordHash: pw, jobRole: "Értékesítő", avatarColor: "#eab308" } }),
   ]);
 
-  const staffPool = [csm1, csm2, closer, setter, copywriter, designer, lpBuilder, ppc, salesRep];
+  const staffPool = [csm1, csm2, closer, setter, copywriter, developer, lpBuilder, ppc, salesRep];
 
   // ---------------------------------------------------------------------
   // Internal sales "account" - The Code's own prospect -> paying customer
@@ -126,6 +126,8 @@ async function main() {
   const now = Date.now();
   const daysAgo = (d: number) => new Date(now - d * 24 * 60 * 60 * 1000);
 
+  const createdAccounts: { id: string; name: string }[] = [];
+
   let accountIndex = 0;
   for (const spec of specs) {
     const account = await prisma.account.create({
@@ -178,7 +180,7 @@ async function main() {
     const csm = pick([csm1, csm2], accountIndex);
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: csm.id, role: "CSM" } });
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: closer.id, role: "Closer" } });
-    await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: designer.id, role: "Grafikus" } });
+    await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: developer.id, role: "Fejlesztő" } });
     await prisma.teamAssignment.create({ data: { accountId: account.id, teamMemberId: ppc.id, role: "PPC Specialista" } });
 
     // Pipeline + custom fields + opportunities
@@ -291,7 +293,7 @@ async function main() {
     });
 
     // Approval items
-    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyári akció – hirdetéskép v1", status: "PENDING_INTERNAL", createdById: designer.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
+    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyári akció – hirdetéskép v1", status: "PENDING_INTERNAL", createdById: copywriter.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
     await prisma.approvalItem.create({ data: { accountId: account.id, type: "AD_COPY", title: "Facebook hirdetésszöveg – v2", status: "PENDING_CLIENT", createdById: copywriter.id } });
     if (accountIndex % 3 === 0) {
       await prisma.approvalItem.create({ data: { accountId: account.id, type: "LANDING", title: "Landing oldal – onboarding review", status: "APPROVED", createdById: lpBuilder.id, decidedAt: daysAgo(2) } });
@@ -357,10 +359,47 @@ async function main() {
     // Credentials
     await prisma.credential.create({ data: { accountId: account.id, label: "Weboldal admin belépés", value: `https://${account.website}/wp-admin · admin / (bizalmas)`, isConfidential: true } });
 
+    createdAccounts.push({ id: account.id, name: account.name });
     accountIndex++;
   }
 
-  console.log(`Seed kész: ${specs.length + 1} account, ${staffPool.length + 1} csapattag.`);
+  // ---------------------------------------------------------------------
+  // Projects (Weboldalak / Webshopok / Applikációk / Automatizációk /
+  // Egyedi rendszerek) - spread across categories, statuses and accounts.
+  // ---------------------------------------------------------------------
+  const PROJECT_CATEGORY_KEYS = ["WEBOLDAL", "WEBSHOP", "APPLIKACIO", "AUTOMATIZACIO", "EGYEDI_RENDSZER"];
+  const PROJECT_STATUS_KEYS = ["IGENYFELMERES", "TERVEZES", "FEJLESZTES", "TESZTELES", "UGYFEL_JOVAHAGYAS", "ELESITVE", "KARBANTARTAS"];
+  const PROJECT_TITLES: Record<string, string[]> = {
+    WEBOLDAL: ["Vállalati bemutatkozó oldal", "Landing oldal újratervezés", "Blog + SEO fejlesztés", "Többnyelvű céges weboldal"],
+    WEBSHOP: ["WooCommerce webshop indítás", "Shopify migráció", "Egyedi checkout folyamat", "Termékkatalógus bővítés"],
+    APPLIKACIO: ["Ügyfél mobil app (iOS/Android)", "Belső admin dashboard", "Foglalási rendszer app", "Ügyfélportál bővítés"],
+    AUTOMATIZACIO: ["CRM–számlázó integráció", "Email automatizáció beállítása", "Készletkezelés automatizálása", "Riport-generálás ütemezése"],
+    EGYEDI_RENDSZER: ["Egyedi ERP modul", "Beléptető rendszer fejlesztés", "Partnerintegrációs API", "Egyedi jelentéskészítő rendszer"],
+  };
+
+  let projectCounter = 0;
+  for (const categoryKey of PROJECT_CATEGORY_KEYS) {
+    const titles = PROJECT_TITLES[categoryKey];
+    for (let i = 0; i < titles.length; i++) {
+      const targetAccount = pick(createdAccounts, projectCounter + i);
+      const status = pick(PROJECT_STATUS_KEYS, projectCounter);
+      const assignee = pick([developer, lpBuilder, ppc, copywriter], projectCounter);
+      await prisma.project.create({
+        data: {
+          accountId: targetAccount.id,
+          category: categoryKey,
+          title: titles[i],
+          status,
+          budget: 300000 + projectCounter * 45000,
+          deadline: status === "ELESITVE" || status === "KARBANTARTAS" ? daysAgo(10 + projectCounter) : daysAgo(-(7 + projectCounter * 3)),
+          assigneeId: assignee.id,
+        },
+      });
+      projectCounter++;
+    }
+  }
+
+  console.log(`Seed kész: ${specs.length + 1} account, ${staffPool.length + 1} csapattag, ${projectCounter} projekt.`);
   console.log("Belső belépés: admin@thecode.hu / thecode123");
   console.log("Ügyfélportál belépés: kapcsolat@zoldkert.hu / ugyfel123");
 }

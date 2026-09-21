@@ -28,7 +28,7 @@ export const TEAM_ROLES = [
   "Closer",
   "Setter",
   "Szövegíró",
-  "Grafikus",
+  "Fejlesztő",
   "LP Építő",
   "PPC Specialista",
   "Értékesítő",
@@ -94,6 +94,28 @@ export const PAYMENT_STATUSES = [
   { key: "PAID", label: "Fizetve" },
   { key: "EXPIRED", label: "Lejárt" },
   { key: "PENDING", label: "Várakozik" },
+] as const;
+
+export const PROJECT_CATEGORIES = [
+  { key: "WEBOLDAL", label: "Weboldalak", slug: "weboldalak" },
+  { key: "WEBSHOP", label: "Webshopok", slug: "webshopok" },
+  { key: "APPLIKACIO", label: "Applikációk", slug: "applikaciok" },
+  { key: "AUTOMATIZACIO", label: "Automatizációk", slug: "automatizaciok" },
+  { key: "EGYEDI_RENDSZER", label: "Egyedi rendszerek", slug: "egyedi-rendszerek" },
+] as const;
+
+export function projectCategoryBySlug(slug: string) {
+  return PROJECT_CATEGORIES.find((c) => c.slug === slug);
+}
+
+export const PROJECT_STATUSES = [
+  { key: "IGENYFELMERES", label: "Igényfelmérés", color: "#6366f1" },
+  { key: "TERVEZES", label: "Tervezés", color: "#3b82f6" },
+  { key: "FEJLESZTES", label: "Fejlesztés", color: "#0ea5e9" },
+  { key: "TESZTELES", label: "Tesztelés", color: "#f59e0b" },
+  { key: "UGYFEL_JOVAHAGYAS", label: "Ügyfél jóváhagyás", color: "#a855f7" },
+  { key: "ELESITVE", label: "Élesítve", color: "#22c55e" },
+  { key: "KARBANTARTAS", label: "Karbantartás", color: "#64748b" },
 ] as const;
 
 export const CONTRACT_STATUSES = [

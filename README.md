@@ -42,6 +42,7 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
 - **Csapat, Naptár, Fizetések (Payments + pénzügyi rekonstrukció), Szerződések** – lásd lent a leegyszerűsítéseket
 - **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
+- **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
 
 ## Tudatosan egyszerűsített / stub részek
 
@@ -49,7 +50,6 @@ Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session ne
 
 - **Meta Ads / Conversion API** – az adatmodell és a UI megvan (`AdMetricSnapshot`, feature flagek), de a tényleges Meta OAuth és a live metrika-húzás helyén egy jól látható "fejlesztés alatt" panel van
 - **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/thecode-xxxxxx`)
-- **AI Creative / Winner Ads / Kreatív sablonok** – csak stub oldal, mert valós kép/szöveg-generáló LLM-hívást igényelnének
 - **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
 - **Fizetési szolgáltató (Stripe/Barion/SimplePay)** – a `Payment` modell és a UI kész, de a "fizetési link" egy generált placeholder URL, nincs mögötte valós fizetési folyamat
 - **PWA telepítés** – nincs `manifest.json` / service worker még
@@ -58,4 +58,4 @@ Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóv
 
 ## Adatmodell
 
-Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, AdMetricSnapshot, Credential) a specifikáció 3. fejezete alapján.
+Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, AdMetricSnapshot, Credential) a specifikáció 3. fejezete alapján.

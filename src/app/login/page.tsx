@@ -16,7 +16,7 @@ export default async function StaffLoginPage({
             T
           </div>
           <h1 className="text-xl font-semibold text-zinc-900">The Code &middot; Belső bejelentkezés</h1>
-          <p className="mt-1 text-sm text-zinc-500">Csapattagoknak (Admin, CSM, Sales, Grafikus, PPC)</p>
+          <p className="mt-1 text-sm text-zinc-500">Csapattagoknak (Admin, CSM, Sales, Fejlesztő, PPC)</p>
         </div>
         {error ? (
           <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
