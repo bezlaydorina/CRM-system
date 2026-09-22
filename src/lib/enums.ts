@@ -113,6 +113,77 @@ export const PROJECT_STATUSES = [
   { key: "KARBANTARTAS", label: "Karbantartás", color: "#64748b" },
 ] as const;
 
+export const INDUSTRIES = [
+  "Kertészet",
+  "Lakberendezés",
+  "Egészségügy",
+  "Kereskedelem",
+  "Autókölcsönzés",
+  "Turizmus",
+  "Sport & fitnesz",
+  "Szépségipar",
+  "Szolgáltatóipar",
+  "Építőipar",
+  "HoReCa",
+  "Egyéb",
+] as const;
+
+export const ACCOUNT_PACKAGES = [
+  {
+    key: "BASIC",
+    label: "Basic",
+    monthlyFee: 97000,
+    setupFee: 179000,
+    description: "Weboldal/webshop + alap CRM + Ügyfélportál. Az induláshoz minden szükséges a helyén.",
+  },
+  {
+    key: "AGENCY",
+    label: "The Code",
+    monthlyFee: 97000,
+    setupFee: 450000,
+    description: "Teljes fejlesztés + CRM automatizáció + AI modul. Hardver opcionálisan +350 000 Ft setup-pal.",
+  },
+  {
+    key: "ENTERPRISE",
+    label: "Enterprise",
+    monthlyFee: 247000,
+    setupFee: 3450000,
+    description: "A teljes The Code rendszer ajándék hardverrel, prémium AI-val és Egyedi rendszerrel, 20+ modullal.",
+  },
+] as const;
+
+export const AI_MODULES = [
+  { key: "CLAUDE", label: "Claude", vendor: "Anthropic" },
+  { key: "CHATGPT", label: "ChatGPT", vendor: "OpenAI" },
+  { key: "GEMINI", label: "Gemini", vendor: "Google" },
+  { key: "GROK", label: "Grok", vendor: "xAI" },
+] as const;
+
+export const HARDWARE_COMPUTERS = [
+  { key: "CUSTOM_PC", label: "Custom PC (AEROCOOL fehér)" },
+  { key: "MAC_MINI", label: "Apple Mac mini M4" },
+  { key: "MACBOOK_AIR", label: "Apple MacBook Air M4" },
+] as const;
+
+export const HARDWARE_MONITORS = [
+  { key: "MSI_34", label: 'MSI MD342CQPW (34" Ultrawide)' },
+  { key: "SAMSUNG_32", label: 'Samsung ViewFinity S7 (32" 4K)' },
+] as const;
+
+export const HARDWARE_SETUP_FEE = 350000;
+
+export const ONBOARDING_ADDONS = [
+  { key: "VIDEO_EDITING", label: "Videó editing csomag", description: "3 db profi vágott videó havonta, social media formátumokra optimalizálva", price: 49000, billing: "MONTHLY" as const },
+  { key: "EXTRA_DESIGN", label: "Extra design csomag", description: "+5 db egyedi grafikai anyag havonta a weboldalhoz/apphoz", price: 59000, billing: "MONTHLY" as const },
+  { key: "AB_TESTING", label: "A/B tesztelés modul", description: "Landing oldal A/B tesztek, riportokkal", price: 49000, billing: "MONTHLY" as const },
+  { key: "LANDING_3D", label: "3D videós landing oldal", description: "Mozgó, 3D-s videóval hajtott landing oldal – a görgetés vezérli a videót. Nem része egyetlen csomagnak sem.", price: 350000, billing: "ONE_TIME" as const },
+  { key: "EMAIL_AUTOMATION", label: "Email kampány automatizáció", description: "Behavioral triggerek, lifecycle és broadcast kampányok", price: 500000, billing: "MONTHLY" as const },
+  { key: "SMS_AUTOMATION", label: "SMS automatizáció", description: "Automata SMS sequence-ek a CRM-ben", price: 79000, billing: "MONTHLY" as const },
+  { key: "MAINTENANCE", label: "Weboldal frissítés és karbantartás", description: "Rendszeres tartalmi frissítés, biztonsági frissítések és technikai karbantartás", price: 25000, billing: "MONTHLY" as const },
+  { key: "PRIORITY_SUPPORT", label: "Priority support", description: "Több havi meeting és rendszeres személyre szabott kommunikáció a csapattal", price: 79000, billing: "MONTHLY" as const },
+  { key: "EXTRA_LANDING", label: "Extra landing oldal", description: "További landing oldal építés, projekthez, termékhez vagy promócióhoz", price: 250000, billing: "ONE_TIME" as const },
+] as const;
+
 export const CONTRACT_STATUSES = [
   { key: "DRAFT", label: "Tervezet" },
   { key: "SENT", label: "Elküldve" },

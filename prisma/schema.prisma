@@ -79,6 +79,10 @@ model Account {
   callButtonEnabled Boolean @default(true)
   featureFlags      String  @default("{\"crm\":true,\"calendar\":true}") // JSON
 
+  package          String? // BASIC | AGENCY | ENTERPRISE - az onboardingnál választott csomag
+  aiModule         String? // CLAUDE | CHATGPT | GEMINI | GROK - opcionális AI modul
+  onboardingExtras String? // JSON: { hardware: { computer, monitor }, addons: string[] } - az onboardingnál választott extrák
+
   portalPasswordHash String? // shared portal login fallback
 
   createdAt DateTime @default(now())
