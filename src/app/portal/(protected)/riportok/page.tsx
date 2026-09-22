@@ -29,7 +29,7 @@ export default async function PortalReportsPage() {
       />
       <Card className="divide-y divide-zinc-100 p-0">
         {reports.map((r) => {
-          const metrics = JSON.parse(r.metrics) as Record<string, number>;
+          const metrics = JSON.parse(r.metrics) as { activeProjects?: number; completedProjects?: number; totalBudget?: number };
           return (
             <div key={r.id} className="flex items-center justify-between px-4 py-3">
               <div>
@@ -37,7 +37,7 @@ export default async function PortalReportsPage() {
                   {r.period === "WEEK" ? "Heti riport" : "Havi riport"} · {r.generatedAt.toLocaleDateString("hu-HU")}
                 </p>
                 <p className="text-xs text-zinc-500">
-                  Költés: {formatHUF(metrics.spend ?? 0)} · Lead: {metrics.leads ?? 0} · ROAS: {metrics.roas ?? "—"}
+                  Aktív projektek: {metrics.activeProjects ?? 0} · Lezárva: {metrics.completedProjects ?? 0} · Összbüdzsé: {formatHUF(metrics.totalBudget ?? 0)}
                 </p>
               </div>
               <div className="flex items-center gap-2">

@@ -48,7 +48,7 @@ export default async function AccountDetailLayout({
         <TabLink href={`/admin/ugyfelek/${id}/attekintes`}>Áttekintés</TabLink>
         <TabLink href={`/admin/ugyfelek/${id}/crm`}>CRM és leadek</TabLink>
         <TabLink href={`/admin/ugyfelek/${id}/adatok`}>Adatok és űrlapok</TabLink>
-        <TabLink href={`/admin/ugyfelek/${id}/meta`}>Meta és szolgáltatások</TabLink>
+        <TabLink href={`/admin/ugyfelek/${id}/szolgaltatasok`}>Projektek és szolgáltatások</TabLink>
         <TabLink href={`/admin/ugyfelek/${id}/penzugy`}>Pénzügy</TabLink>
       </div>
 

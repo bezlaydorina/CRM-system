@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export function MilestoneCelebration({ accountId }: { accountId: string }) {
   const [show, setShow] = useState(false);
-  const key = `thecode_milestone_ads_live_${accountId}`;
+  const key = `thecode_milestone_live_${accountId}`;
 
   useEffect(() => {
     try {
@@ -41,8 +41,8 @@ export function MilestoneCelebration({ accountId }: { accountId: string }) {
           ))}
         </div>
         <p className="text-3xl">🎉</p>
-        <h2 className="mt-2 text-lg font-semibold text-zinc-900">Elindultak a hirdetéseid!</h2>
-        <p className="mt-1 text-sm text-zinc-500">Mostantól élőben követheted a teljesítményt itt a kezdőlapon.</p>
+        <h2 className="mt-2 text-lg font-semibold text-zinc-900">Elindult az együttműködésünk!</h2>
+        <p className="mt-1 text-sm text-zinc-500">Mostantól élőben követheted a projektjeid állását itt a kezdőlapon.</p>
         <button
           onClick={() => setShow(false)}
           className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"

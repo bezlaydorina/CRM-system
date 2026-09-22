@@ -3,13 +3,13 @@
 import { useState, useTransition } from "react";
 import { askAssistantAction } from "@/lib/actions/assistant-actions";
 
-const SUGGESTIONS = ["Hogy mennek most a hirdetéseim?", "Melyik kampány hozza most a legtöbbet?", "Adj egy landing page tippet ami tényleg működik"];
+const SUGGESTIONS = ["Hogy állnak a projektjeim?", "Mikor van a legközelebbi határidő?", "Adj egy landing page tippet ami tényleg működik"];
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
 
 export function AssistantChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", text: "Szia! Kérdezz bármit a saját kampányaidról, riportjaidról vagy leadjeidről." },
+    { role: "assistant", text: "Szia! Kérdezz bármit a saját projektjeidről, riportjaidról vagy leadjeidről." },
   ]);
   const [input, setInput] = useState("");
   const [pending, startTransition] = useTransition();

@@ -77,7 +77,7 @@ model Account {
 
   nameFormat        String  @default("HU") // HU | EN
   callButtonEnabled Boolean @default(true)
-  featureFlags      String  @default("{\"crm\":true,\"calendar\":true,\"chatGptAdsTab\":false}") // JSON
+  featureFlags      String  @default("{\"crm\":true,\"calendar\":true}") // JSON
 
   portalPasswordHash String? // shared portal login fallback
 
@@ -93,7 +93,6 @@ model Account {
   reports         Report[]
   conversation    Conversation?
   fileAssets      FileAsset[]
-  adMetrics       AdMetricSnapshot[]
   credentials     Credential[]
   activityEntries ActivityLogEntry[]
   calendarEvents  CalendarEvent[]
@@ -254,7 +253,7 @@ model Task {
 
   title         String
   description   String?
-  category      String      @default("Egyéb") // Sikertelen fizetés, Felhívni, Kreatív, Hirdetésszöveg, Landing, Összeállítás...
+  category      String      @default("Egyéb") // Sikertelen fizetés, Felhívni, Kreatív, Szövegírás, Landing, Összeállítás...
   priority      String      @default("MEDIUM") // LOW|MEDIUM|HIGH|URGENT
   dueAt         DateTime?
   assigneeId    String?
@@ -293,7 +292,7 @@ model ApprovalItem {
   id          String      @id @default(cuid())
   accountId   String
   account     Account     @relation(fields: [accountId], references: [id])
-  type        String // CREATIVE|LANDING|AD_COPY|IMAGE
+  type        String // CREATIVE|LANDING|COPY|IMAGE
   title       String
   status      String      @default("PENDING_INTERNAL") // DRAFT|PENDING_INTERNAL|PENDING_CLIENT|APPROVED|REJECTED
   fileUrl     String?
@@ -403,23 +402,6 @@ model CalendarEvent {
   endAt          DateTime
   meetLink       String?
   createdAt      DateTime     @default(now())
-}
-
-// ---------------------------------------------------------------------------
-// Ads / metrics
-// ---------------------------------------------------------------------------
-
-model AdMetricSnapshot {
-  id          String   @id @default(cuid())
-  accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
-  date        DateTime
-  spend       Float    @default(0)
-  impressions Int      @default(0)
-  clicks      Int      @default(0)
-  leads       Int      @default(0)
-
-  @@index([accountId, date])
 }
 
 model Credential {

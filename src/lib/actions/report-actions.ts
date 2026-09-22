@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
-import { subDays } from "date-fns";
+
+const COMPLETED_STATUSES = ["ELESITVE", "KARBANTARTAS"];
 
 export async function generateManualReportAction() {
   const accountId = await getEffectiveAccountId();
@@ -14,18 +15,26 @@ export async function generateManualReportAction() {
   });
   if (usedThisMonth >= 1) return;
 
-  const snapshots = await prisma.adMetricSnapshot.findMany({ where: { accountId, date: { gte: subDays(new Date(), 7) } } });
-  const spend = snapshots.reduce((s, x) => s + x.spend, 0);
-  const impressions = snapshots.reduce((s, x) => s + x.impressions, 0);
-  const clicks = snapshots.reduce((s, x) => s + x.clicks, 0);
-  const leads = snapshots.reduce((s, x) => s + x.leads, 0);
+  const projects = await prisma.project.findMany({ where: { accountId } });
+  const completedProjects = projects.filter((p) => COMPLETED_STATUSES.includes(p.status)).length;
+  const activeProjects = projects.length - completedProjects;
+  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
+  const nextDeadline = projects
+    .map((p) => p.deadline)
+    .filter((d): d is Date => d != null && d > new Date())
+    .sort((a, b) => a.getTime() - b.getTime())[0];
 
   await prisma.report.create({
     data: {
       accountId,
       period: "WEEK",
       isAutomatic: false,
-      metrics: JSON.stringify({ spend, impressions, clicks, leads, roas: spend ? (leads * 20000 / spend).toFixed(2) : "0" }),
+      metrics: JSON.stringify({
+        activeProjects,
+        completedProjects,
+        totalBudget,
+        nextDeadline: nextDeadline ? nextDeadline.toISOString() : null,
+      }),
     },
   });
 

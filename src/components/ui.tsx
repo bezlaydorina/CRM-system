@@ -48,7 +48,7 @@ export function StubNotice({ feature }: { feature: string }) {
     <Card className="border-dashed bg-zinc-50 text-center">
       <p className="text-sm font-semibold text-zinc-600">🚧 {feature} – fejlesztés alatt</p>
       <p className="mt-1 text-xs text-zinc-500">
-        Ez a modul valós 3rd-party integrációt (pl. Meta Ads API, AI kép/szöveggenerálás) igényelne, amihez ebben a
+        Ez a modul valós 3rd-party integrációt (pl. AI kép/szöveggenerálás) igényelne, amihez ebben a
         demóban nincs élő API-kulcs. A funkció felülete és adatmodellje elő van készítve, hogy egy API-kulcs
         birtokában könnyen bekapcsolható legyen.
       </p>

@@ -29,7 +29,7 @@ export default async function UgyfelekPage({
   const columns: KanbanColumn[] = ACCOUNT_LIFECYCLE_STAGES.map((s) => ({
     id: s.key,
     title: s.label,
-    accentColor: s.key === "LOST" ? "#ef4444" : s.key === "ADS_LIVE" || s.key === "RETAINED" ? "#22c55e" : "#6366f1",
+    accentColor: s.key === "LOST" ? "#ef4444" : s.key === "LIVE" || s.key === "RETAINED" ? "#22c55e" : "#6366f1",
   }));
 
   const items: KanbanItem[] = accounts.map((a) => {

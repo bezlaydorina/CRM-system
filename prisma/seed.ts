@@ -27,7 +27,7 @@ async function createPipeline(accountId: string, name = "Új ügyfelek") {
 
 const LEAD_FIRST_NAMES = ["Anna", "Bence", "Csilla", "Dávid", "Emese", "Ferenc", "Gabriella", "Hunor", "Ildikó", "János"];
 const LEAD_LAST_NAMES = ["Szabó", "Kovács", "Tóth", "Nagy", "Horváth", "Varga", "Kiss", "Molnár", "Farkas", "Balogh"];
-const SOURCES = ["facebook_lead_ads", "landing_page", "google_ads", "referral", "organic"];
+const SOURCES = ["landing_page", "referral", "organic", "email", "partner"];
 
 function pick<T>(arr: readonly T[], i: number): T {
   return arr[i % arr.length];
@@ -66,7 +66,7 @@ async function main() {
       name: "The Code - Belső Sales",
       status: "ACTIVE",
       isInternalSales: true,
-      lifecycleStage: "ADS_LIVE",
+      lifecycleStage: "LIVE",
     },
   });
   const salesPipeline = await createPipeline(salesAccount.id, "Belső sales CRM");
@@ -108,7 +108,7 @@ async function main() {
 
   const specs: AccountSpec[] = [
     { name: "Zöld Kert Kft.", website: "zoldkert.hu", industry: "Kertészet", stage: "RETAINED", daysInStage: 62, monthlyFee: 180000, setupFee: 150000, contractSigned: true, lastPaymentDaysAgo: 3 },
-    { name: "Aurora Bútor Kft.", website: "aurorabutor.hu", industry: "Lakberendezés", stage: "ADS_LIVE", daysInStage: 9, monthlyFee: 220000, setupFee: 180000, contractSigned: true, lastPaymentDaysAgo: 12 },
+    { name: "Aurora Bútor Kft.", website: "aurorabutor.hu", industry: "Lakberendezés", stage: "LIVE", daysInStage: 9, monthlyFee: 220000, setupFee: 180000, contractSigned: true, lastPaymentDaysAgo: 12 },
     { name: "Napfény Fogászat", website: "napfenyfogaszat.hu", industry: "Egészségügy", stage: "CSM_CONTACT", daysInStage: 2, monthlyFee: 160000, setupFee: 120000, contractSigned: false, lastPaymentDaysAgo: null },
     { name: "Kristály Ékszer", website: "kristalyekszer.hu", industry: "Kereskedelem", stage: "MEETING", daysInStage: 5, monthlyFee: 140000, setupFee: 100000, contractSigned: false, lastPaymentDaysAgo: null },
     { name: "Prémium Autó Bérlés", website: "premiumautoberles.hu", industry: "Autókölcsönzés", stage: "ONBOARDING_FORM", daysInStage: 4, monthlyFee: 200000, setupFee: 150000, contractSigned: true, lastPaymentDaysAgo: 6 },
@@ -119,13 +119,13 @@ async function main() {
     { name: "GreenBuild Építőipar", website: "greenbuild.hu", industry: "Építőipar", stage: "ADMIN_APPROVAL", daysInStage: 1, monthlyFee: 210000, setupFee: 160000, contractSigned: true, lastPaymentDaysAgo: 5 },
     { name: "Sunrise Utazási Iroda", website: "sunrise-utazas.hu", industry: "Turizmus", stage: "READY_TO_LAUNCH", daysInStage: 1, monthlyFee: 190000, setupFee: 140000, contractSigned: true, lastPaymentDaysAgo: 2 },
     { name: "Old Habits Kávézó", website: "oldhabits.hu", industry: "HoReCa", stage: "LOST", daysInStage: 90, monthlyFee: 130000, setupFee: 90000, contractSigned: false, lastPaymentDaysAgo: 120, status: "ARCHIVED" },
-    { name: "Demo Teszt Fiók", website: "example.com", industry: "Teszt", stage: "ADS_LIVE", daysInStage: 15, monthlyFee: 0, setupFee: 0, contractSigned: false, lastPaymentDaysAgo: null, isTestAccount: true },
+    { name: "Demo Teszt Fiók", website: "example.com", industry: "Teszt", stage: "LIVE", daysInStage: 15, monthlyFee: 0, setupFee: 0, contractSigned: false, lastPaymentDaysAgo: null, isTestAccount: true },
   ];
 
   const now = Date.now();
   const daysAgo = (d: number) => new Date(now - d * 24 * 60 * 60 * 1000);
 
-  const createdAccounts: { id: string; name: string }[] = [];
+  const createdAccounts: { id: string; name: string; live: boolean }[] = [];
 
   let accountIndex = 0;
   for (const spec of specs) {
@@ -223,7 +223,7 @@ async function main() {
         pipelineId: pipeline.id,
         stageId: pipeline.stages[0].id,
         accountId: account.id,
-        name: "Facebook Lead Ads",
+        name: "Weboldal kapcsolatfelvételi űrlap",
       },
     });
 
@@ -278,9 +278,9 @@ async function main() {
       data: {
         organizationId: org.id,
         accountId: account.id,
-        title: "Hirdetés szövegírása",
-        description: "Írj 3 variánst az új kampányhoz.",
-        category: "Hirdetésszöveg",
+        title: "Weboldal szövegének megírása",
+        description: "Írj 3 variánst az új szekcióhoz.",
+        category: "Szövegírás",
         priority: "MEDIUM",
         dueAt: daysAgo(-3),
         assigneeId: dev2.id,
@@ -289,8 +289,8 @@ async function main() {
     });
 
     // Approval items
-    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyári akció – hirdetéskép v1", status: "PENDING_INTERNAL", createdById: dev2.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
-    await prisma.approvalItem.create({ data: { accountId: account.id, type: "AD_COPY", title: "Facebook hirdetésszöveg – v2", status: "PENDING_CLIENT", createdById: dev2.id } });
+    await prisma.approvalItem.create({ data: { accountId: account.id, type: "CREATIVE", title: "Nyitóoldal – bannerkép v1", status: "PENDING_INTERNAL", createdById: dev2.id, fileUrl: "/mock-assets/creative-placeholder.svg" } });
+    await prisma.approvalItem.create({ data: { accountId: account.id, type: "COPY", title: "Weboldal szöveg – v2", status: "PENDING_CLIENT", createdById: dev2.id } });
     if (accountIndex % 3 === 0) {
       await prisma.approvalItem.create({ data: { accountId: account.id, type: "LANDING", title: "Landing oldal – onboarding review", status: "APPROVED", createdById: dev3.id, decidedAt: daysAgo(2) } });
     }
@@ -310,39 +310,6 @@ async function main() {
       },
     });
 
-    // Reports
-    if (isAccountLive(spec.stage)) {
-      for (let w = 0; w < 4; w++) {
-        await prisma.report.create({
-          data: {
-            accountId: account.id,
-            period: "WEEK",
-            generatedAt: daysAgo(w * 7),
-            isAutomatic: true,
-            metrics: JSON.stringify({
-              spend: 40000 + w * 5000,
-              impressions: 80000 + w * 6000,
-              clicks: 2200 + w * 120,
-              leads: 38 + w * 3,
-              roas: (2.1 + w * 0.1).toFixed(2),
-            }),
-          },
-        });
-      }
-      for (let d = 0; d < 30; d++) {
-        await prisma.adMetricSnapshot.create({
-          data: {
-            accountId: account.id,
-            date: daysAgo(d),
-            spend: 8000 + Math.round(Math.sin(d) * 1500) + d * 30,
-            impressions: 12000 + Math.round(Math.cos(d) * 2000) + d * 50,
-            clicks: 300 + Math.round(Math.sin(d / 2) * 40),
-            leads: 6 + (d % 4),
-          },
-        });
-      }
-    }
-
     // Conversation + messages
     const conversation = await prisma.conversation.create({ data: { accountId: account.id } });
     await prisma.message.create({ data: { conversationId: conversation.id, senderType: "STAFF", staffId: csm.id, body: `Szép napot ${primaryContact.fullName}! Elindítottuk az onboardingot, hamarosan jelezzük a következő lépést.` } });
@@ -355,7 +322,7 @@ async function main() {
     // Credentials
     await prisma.credential.create({ data: { accountId: account.id, label: "Weboldal admin belépés", value: `https://${account.website}/wp-admin · admin / (bizalmas)`, isConfidential: true } });
 
-    createdAccounts.push({ id: account.id, name: account.name });
+    createdAccounts.push({ id: account.id, name: account.name, live: isAccountLive(spec.stage) });
     accountIndex++;
   }
 
@@ -392,6 +359,39 @@ async function main() {
         },
       });
       projectCounter++;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Reports - project-progress summaries (weekly, auto-generated) for
+  // accounts in an active engagement.
+  // ---------------------------------------------------------------------
+  const COMPLETED_STATUSES = ["ELESITVE", "KARBANTARTAS"];
+  for (const acc of createdAccounts.filter((a) => a.live)) {
+    const accountProjects = await prisma.project.findMany({ where: { accountId: acc.id } });
+    const completed = accountProjects.filter((p) => COMPLETED_STATUSES.includes(p.status)).length;
+    const active = accountProjects.length - completed;
+    const totalBudget = accountProjects.reduce((sum, p) => sum + p.budget, 0);
+    const nextDeadline = accountProjects
+      .map((p) => p.deadline)
+      .filter((d): d is Date => d != null && d > new Date())
+      .sort((a, b) => a.getTime() - b.getTime())[0];
+
+    for (let w = 0; w < 4; w++) {
+      await prisma.report.create({
+        data: {
+          accountId: acc.id,
+          period: "WEEK",
+          generatedAt: daysAgo(w * 7),
+          isAutomatic: true,
+          metrics: JSON.stringify({
+            activeProjects: active,
+            completedProjects: Math.max(0, completed - w),
+            totalBudget,
+            nextDeadline: nextDeadline ? nextDeadline.toISOString() : null,
+          }),
+        },
+      });
     }
   }
 

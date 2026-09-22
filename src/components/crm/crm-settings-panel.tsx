@@ -169,7 +169,7 @@ export function CrmSettingsPanel({
         </div>
         <form action={createWebhookAction.bind(null, accountId)} className="mt-3 space-y-2">
           <input type="hidden" name="pipelineId" value={activePipeline.id} />
-          <input name="name" placeholder="Webhook neve (pl. Facebook Lead Ads)" className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" required />
+          <input name="name" placeholder="Webhook neve (pl. Weboldal kontakt űrlap)" className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" required />
           <select name="stageId" className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" required>
             {activePipeline.stages.map((s) => (
               <option key={s.id} value={s.id}>

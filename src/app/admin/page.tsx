@@ -31,7 +31,7 @@ export default async function AdminDashboardPage() {
   const mrr = liveAccounts.reduce((sum, a) => sum + a.monthlyFee, 0);
   const stuckAccounts = activeAccounts.filter((a) => {
     const days = daysSince(a.lifecycleEnteredAt);
-    return days > 14 && a.lifecycleStage !== "ADS_LIVE" && a.lifecycleStage !== "RETAINED" && a.lifecycleStage !== "LOST";
+    return days > 14 && a.lifecycleStage !== "LIVE" && a.lifecycleStage !== "RETAINED" && a.lifecycleStage !== "LOST";
   });
 
   return (
@@ -44,11 +44,11 @@ export default async function AdminDashboardPage() {
           <p className="mt-1 text-2xl font-semibold">{activeAccounts.length}</p>
         </Card>
         <Card>
-          <p className="text-xs font-medium text-zinc-500">Élő hirdetéssel</p>
+          <p className="text-xs font-medium text-zinc-500">Aktív együttműködésben</p>
           <p className="mt-1 text-2xl font-semibold">{liveAccounts.length}</p>
         </Card>
         <Card>
-          <p className="text-xs font-medium text-zinc-500">Havi MRR (aktív hirdetők)</p>
+          <p className="text-xs font-medium text-zinc-500">Havi MRR (aktív ügyfelek)</p>
           <p className="mt-1 text-2xl font-semibold">{formatHUF(mrr)}</p>
         </Card>
         <Card className={stuckAccounts.length > 0 ? "border-amber-300 bg-amber-50" : ""}>

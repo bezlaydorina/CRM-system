@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId, getSession } from "@/lib/auth";
 import { PageHeader, Card, Badge } from "@/components/ui";
-import { isAccountLive } from "@/lib/enums";
 import {
   updateOwnProfileAction,
   invitePortalTeammateAction,
@@ -11,8 +10,7 @@ import {
 export default async function PortalSettingsPage() {
   const accountId = (await getEffectiveAccountId())!;
   const session = await getSession();
-  const [account, contacts, me] = await Promise.all([
-    prisma.account.findUnique({ where: { id: accountId } }),
+  const [contacts, me] = await Promise.all([
     prisma.contact.findMany({ where: { accountId, canLoginPortal: true }, orderBy: { isPrimary: "desc" } }),
     session?.kind === "client" ? prisma.contact.findUnique({ where: { id: session.contactId } }) : null,
   ]);
@@ -86,11 +84,6 @@ export default async function PortalSettingsPage() {
             Az ügyfélportál Progressive Web App (PWA) telepítést ebben az MVP-ben a manifest/service worker
             hiányában még nem támogatja – ez a következő fejlesztési kör (12.2/7. fázis) része.
           </p>
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold text-zinc-700">Meta hirdetési fiók</h2>
-          {isAccountLive(account?.lifecycleStage ?? "") ? <Badge color="green">Csatlakoztatva (demó adat)</Badge> : <Badge color="gray">Nincs csatlakoztatva</Badge>}
         </Card>
       </div>
     </div>

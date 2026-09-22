@@ -116,7 +116,6 @@ export async function updateFeatureFlagsAction(accountId: string, formData: Form
   const flags = {
     crm: formData.get("crm") === "on",
     calendar: formData.get("calendar") === "on",
-    chatGptAdsTab: formData.get("chatGptAdsTab") === "on",
   };
   await prisma.account.update({ where: { id: accountId }, data: { featureFlags: JSON.stringify(flags) } });
   revalidatePath(`/admin/ugyfelek/${accountId}`);

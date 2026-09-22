@@ -27,7 +27,7 @@ export default async function AccountOverviewPage({ params }: { params: Promise<
   if (!account) notFound();
 
   const creativesDelivered = approvals.filter((a) => a.type === "CREATIVE" && a.status === "APPROVED").length;
-  const copiesDelivered = approvals.filter((a) => a.type === "AD_COPY" && a.status === "APPROVED").length;
+  const copiesDelivered = approvals.filter((a) => a.type === "COPY" && a.status === "APPROVED").length;
   const landingsDelivered = approvals.filter((a) => a.type === "LANDING" && a.status === "APPROVED").length;
 
   return (

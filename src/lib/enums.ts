@@ -11,7 +11,7 @@ export const ACCOUNT_LIFECYCLE_STAGES = [
   { key: "IN_REVISION", label: "Javításon" },
   { key: "ADMIN_APPROVAL", label: "Admin jóváhagyásra vár" },
   { key: "READY_TO_LAUNCH", label: "Indítható" },
-  { key: "ADS_LIVE", label: "Hirdetések futnak" },
+  { key: "LIVE", label: "Aktív együttműködés" },
   { key: "RETAINED", label: "1. hónap → 1. év" },
   { key: "LOST", label: "LOST" },
 ] as const;
@@ -24,7 +24,7 @@ export function lifecycleLabel(key: string) {
 
 /** Whether an account is in an actively-running engagement stage. */
 export function isAccountLive(lifecycleStage: string) {
-  return lifecycleStage === "ADS_LIVE" || lifecycleStage === "RETAINED";
+  return lifecycleStage === "LIVE" || lifecycleStage === "RETAINED";
 }
 
 export const TEAM_ROLES = ["Admin", "CSM", "Closer", "Setter", "Fejlesztő", "Értékesítő"] as const;
@@ -46,7 +46,7 @@ export const TASK_CATEGORIES = [
   "Sikertelen fizetés",
   "Felhívni",
   "Kreatív",
-  "Hirdetésszöveg",
+  "Szövegírás",
   "Landing",
   "Összeállítás",
   "Egyéb",
@@ -71,7 +71,7 @@ export const TASK_STATUS_COLUMNS = [
 export const APPROVAL_TYPES = [
   { key: "CREATIVE", label: "Kreatívok" },
   { key: "LANDING", label: "Landing oldalak" },
-  { key: "AD_COPY", label: "Hirdetés szövegek" },
+  { key: "COPY", label: "Szövegek" },
   { key: "IMAGE", label: "Elutasított képek" },
 ] as const;
 
