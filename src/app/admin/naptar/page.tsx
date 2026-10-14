@@ -71,7 +71,7 @@ export default async function CalendarPage() {
                     <div className="flex items-center gap-2">
                       <Badge color="indigo">{EVENT_TYPE_LABELS[e.type] ?? e.type}</Badge>
                       {e.meetLink ? (
-                        <a href={e.meetLink} className="text-xs text-emerald-600 hover:underline">
+                        <a href={e.meetLink} className="text-xs text-brand-gold hover:underline">
                           Meet link
                         </a>
                       ) : (
@@ -111,7 +111,7 @@ export default async function CalendarPage() {
               ))}
             </select>
             <input name="startAt" type="datetime-local" required className="rounded-lg border border-zinc-300 px-2 py-1.5" />
-            <button className="rounded-lg bg-indigo-600 px-3 py-1.5 font-semibold text-white">Foglalás létrehozása</button>
+            <button className="rounded-lg bg-brand-gold px-3 py-1.5 font-semibold text-white">Foglalás létrehozása</button>
           </form>
         </Card>
       </div>

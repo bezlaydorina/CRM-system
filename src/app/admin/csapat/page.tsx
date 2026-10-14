@@ -32,7 +32,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
               <Avatar name={m.name} color={m.avatarColor} size={14} />
             </div>
             <p className="text-sm font-semibold text-zinc-800">{m.name}</p>
-            <p className="text-xs text-indigo-600">{m.jobRole}</p>
+            <p className="text-xs text-brand-gold">{m.jobRole}</p>
             <p className="mt-1 text-[11px] text-zinc-400">{m.email}</p>
             <p className="text-[11px] text-zinc-400">{m.phone ?? "—"}</p>
           </Card>
@@ -40,7 +40,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
 
         <Card className="flex items-center justify-center border-dashed">
           <details className="w-full text-center">
-            <summary className="cursor-pointer text-sm font-medium text-indigo-600">+ Új csapattag</summary>
+            <summary className="cursor-pointer text-sm font-medium text-brand-gold">+ Új csapattag</summary>
             <form action={createTeamMemberAction} className="mt-3 flex flex-col gap-2 text-left">
               <input name="name" placeholder="Név" required className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" />
               <input name="email" type="email" placeholder="Email" required className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" />
@@ -52,7 +52,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
                   </option>
                 ))}
               </select>
-              <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white">Létrehozás</button>
+              <button className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white">Létrehozás</button>
             </form>
           </details>
         </Card>

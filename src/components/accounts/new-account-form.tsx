@@ -30,7 +30,7 @@ export function NewAccountForm() {
           <Field label="Cégnév *" name="name" placeholder="Pl. Példa Kft." required className="sm:col-span-2" />
           <label className="text-sm font-medium text-zinc-700">
             Iparág *
-            <select name="industry" required defaultValue="" className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            <select name="industry" required defaultValue="" className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none">
               <option value="" disabled>
                 Válassz iparágat
               </option>
@@ -56,7 +56,7 @@ export function NewAccountForm() {
           </span>
         </label>
         {wantsPassword ? (
-          <input name="password" type="password" placeholder="Jelszó (min. 4 karakter)" minLength={4} className="mt-2 w-full max-w-xs rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" />
+          <input name="password" type="password" placeholder="Jelszó (min. 4 karakter)" minLength={4} className="mt-2 w-full max-w-xs rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none" />
         ) : null}
 
         <div className="mt-4 border-t border-zinc-100 pt-4">
@@ -79,7 +79,7 @@ export function NewAccountForm() {
               onClick={() => setPackageKey(p.key)}
               className={clsx(
                 "flex flex-col rounded-xl border-2 p-4 text-left transition",
-                packageKey === p.key ? "border-indigo-600 bg-indigo-50" : "border-zinc-200 hover:border-zinc-300"
+                packageKey === p.key ? "border-brand-gold bg-brand-gold/10" : "border-zinc-200 hover:border-zinc-300"
               )}
             >
               <span className="flex items-center justify-between">
@@ -111,7 +111,7 @@ export function NewAccountForm() {
                 min={0}
                 value={customMonthlyFee}
                 onChange={(e) => setCustomMonthlyFee(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none"
               />
             </label>
             <label className="text-sm font-medium text-zinc-700">
@@ -122,7 +122,7 @@ export function NewAccountForm() {
                 min={0}
                 value={customSetupFee}
                 onChange={(e) => setCustomSetupFee(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none"
               />
             </label>
           </div>
@@ -133,18 +133,18 @@ export function NewAccountForm() {
         <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-700">⚡ Lezárás</h2>
         <label className="block text-sm font-medium text-zinc-700">
           Szerződés aláírva
-          <input name="contractSignedAt" type="date" className="mt-1 w-full max-w-xs rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" />
+          <input name="contractSignedAt" type="date" className="mt-1 w-full max-w-xs rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none" />
         </label>
         <p className="mt-1 text-xs text-zinc-500">A befizetési rekord automatikusan létrejön a megadott dátummal, holnaptól lejártnak jelenik meg a dashboard-on, míg be nem pipálod.</p>
 
         <label className="mt-4 block text-sm font-medium text-zinc-700">
           Belső megjegyzés (opcionális)
-          <textarea name="internalNote" rows={2} placeholder="Meeting összefoglaló, speciális kérések, stb." className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" />
+          <textarea name="internalNote" rows={2} placeholder="Meeting összefoglaló, speciális kérések, stb." className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none" />
         </label>
 
         <label className="mt-4 block text-sm font-medium text-zinc-700">
           Projekt leírás
-          <textarea name="projectNote" rows={2} placeholder="Milyen projektet kell fejleszteni? (rövid leírás)" className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" />
+          <textarea name="projectNote" rows={2} placeholder="Milyen projektet kell fejleszteni? (rövid leírás)" className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none" />
         </label>
       </Card>
 
@@ -156,7 +156,7 @@ export function NewAccountForm() {
           <Link href="/admin/ugyfelek" className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
             Mégse
           </Link>
-          <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+          <button type="submit" className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-dark">
             ✓ Teljes létrehozás
           </button>
         </div>
@@ -188,7 +188,7 @@ function Field({
         type={type}
         required={required}
         placeholder={placeholder}
-        className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+        className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none"
       />
     </label>
   );

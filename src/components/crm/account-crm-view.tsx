@@ -67,7 +67,7 @@ export async function AccountCrmView({
               key={p.id}
               href={`?view=${view}&pipeline=${p.id}`}
               className={`rounded-full px-3 py-1 text-xs font-medium ${
-                p.id === activePipeline.id ? "bg-indigo-600 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                p.id === activePipeline.id ? "bg-brand-gold text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
               }`}
             >
               {p.name} {p.isDefault ? "★" : ""}

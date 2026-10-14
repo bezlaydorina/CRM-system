@@ -175,7 +175,7 @@ function Column({
         ref={setNodeRef}
         className={clsx(
           "flex min-h-[120px] flex-col gap-2 rounded-xl border border-dashed p-2 transition-colors",
-          isOver ? "border-indigo-400 bg-indigo-50" : "border-zinc-200 bg-zinc-50/50"
+          isOver ? "border-brand-gold/80 bg-brand-gold/10" : "border-zinc-200 bg-zinc-50/50"
         )}
       >
         {items.map((item) => (

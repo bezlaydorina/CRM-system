@@ -64,15 +64,15 @@ export default async function AccountOverviewPage({ params }: { params: Promise<
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Mit kapott meg az ügyfél</h2>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <p className="text-2xl font-semibold text-indigo-600">{creativesDelivered}</p>
+              <p className="text-2xl font-semibold text-brand-gold">{creativesDelivered}</p>
               <p className="text-xs text-zinc-500">Kiadott kreatív</p>
             </div>
             <div>
-              <p className="text-2xl font-semibold text-indigo-600">{copiesDelivered}</p>
+              <p className="text-2xl font-semibold text-brand-gold">{copiesDelivered}</p>
               <p className="text-xs text-zinc-500">Kiadott szöveg</p>
             </div>
             <div>
-              <p className="text-2xl font-semibold text-indigo-600">{landingsDelivered}</p>
+              <p className="text-2xl font-semibold text-brand-gold">{landingsDelivered}</p>
               <p className="text-xs text-zinc-500">Landing oldal</p>
             </div>
           </div>

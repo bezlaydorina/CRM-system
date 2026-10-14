@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
         <Card className="lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-700">Beérkező leadek – összes ügyfél</h2>
-            <Link href="/admin/crm" className="text-xs font-medium text-indigo-600 hover:underline">
+            <Link href="/admin/crm" className="text-xs font-medium text-brand-gold hover:underline">
               Összes megnyitása →
             </Link>
           </div>
@@ -91,7 +91,7 @@ export default async function AdminDashboardPage() {
         <Card>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-700">Sürgős feladatok</h2>
-            <Link href="/admin/feladatok" className="text-xs font-medium text-indigo-600 hover:underline">
+            <Link href="/admin/feladatok" className="text-xs font-medium text-brand-gold hover:underline">
               Tábla →
             </Link>
           </div>
@@ -114,14 +114,14 @@ export default async function AdminDashboardPage() {
       </div>
 
       {newAccounts.length > 0 ? (
-        <Card className="mt-6 border-indigo-200 bg-indigo-50">
-          <h2 className="mb-2 text-sm font-semibold text-indigo-800">Új ügyfelek (48 órás triage)</h2>
+        <Card className="mt-6 border-brand-gold/30 bg-brand-gold/10">
+          <h2 className="mb-2 text-sm font-semibold text-brand-maroon">Új ügyfelek (48 órás triage)</h2>
           <div className="flex flex-wrap gap-2">
             {newAccounts.map((a) => (
               <Link
                 key={a.id}
                 href={`/admin/ugyfelek/${a.id}`}
-                className="rounded-full bg-white px-3 py-1 text-xs font-medium text-indigo-700 shadow-sm hover:shadow"
+                className="rounded-full bg-white px-3 py-1 text-xs font-medium text-brand-gold-dark shadow-sm hover:shadow"
               >
                 {a.name}
               </Link>

@@ -13,7 +13,7 @@ export default async function AffiliatePage() {
 
       <Card className="mb-6">
         <p className="text-sm text-zinc-600">Az egyedi ajánlói kódod:</p>
-        <p className="mt-1 font-mono text-xl font-semibold text-emerald-700">{referralCode}</p>
+        <p className="mt-1 font-mono text-xl font-semibold text-brand-gold-dark">{referralCode}</p>
         <Badge color="green">0 sikeres ajánlás eddig</Badge>
       </Card>
 
@@ -34,7 +34,7 @@ export default async function AffiliatePage() {
 function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
     <Card>
-      <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 font-semibold text-emerald-700">{n}</div>
+      <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold/15 font-semibold text-brand-gold-dark">{n}</div>
       <p className="text-sm font-semibold text-zinc-800">{title}</p>
       <p className="mt-1 text-xs text-zinc-500">{desc}</p>
     </Card>

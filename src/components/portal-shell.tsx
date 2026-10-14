@@ -14,15 +14,15 @@ export function PortalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full bg-zinc-100">
-      <aside className="flex w-60 flex-shrink-0 flex-col bg-emerald-950 text-white">
+    <div className="flex min-h-screen w-full bg-brand-bg">
+      <aside className="flex w-60 flex-shrink-0 flex-col bg-brand-maroon text-white">
         <div className="flex items-center gap-2 px-4 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-sm font-bold">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold">
             {account.name.slice(0, 1).toUpperCase()}
           </div>
           <div>
             <p className="truncate text-sm font-semibold leading-tight">{account.name}</p>
-            <p className="text-[11px] text-emerald-300 leading-tight">Ügyfélportál</p>
+            <p className="text-[11px] text-white/50 leading-tight">Ügyfélportál</p>
           </div>
         </div>
 
@@ -44,11 +44,11 @@ export function PortalShell({
           <div className="flex items-center justify-between rounded-lg bg-white/5 px-2 py-2">
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold">{contact?.fullName ?? "Admin nézet"}</p>
-              <p className="truncate text-[11px] text-emerald-300">{contact?.email ?? "impersonáció"}</p>
+              <p className="truncate text-[11px] text-white/50">{contact?.email ?? "impersonáció"}</p>
             </div>
             {!isImpersonating ? (
               <form action={logoutAction}>
-                <button title="Kijelentkezés" className="text-emerald-300 hover:text-white">
+                <button title="Kijelentkezés" className="text-white/50 hover:text-white">
                   ⏻
                 </button>
               </form>

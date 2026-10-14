@@ -42,7 +42,7 @@ export function ProjectBoard({
               </button>
             </form>
           </div>
-          <Link href={`/admin/ugyfelek/${p.account.id}`} className="text-xs text-indigo-600 hover:underline">
+          <Link href={`/admin/ugyfelek/${p.account.id}`} className="text-xs text-brand-gold hover:underline">
             {p.account.name}
           </Link>
           <div className="mt-2 flex items-center justify-between">

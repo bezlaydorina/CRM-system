@@ -44,17 +44,17 @@ export function ContractsTable({ contracts }: { contracts: ContractRow[] }) {
                   <span className="text-zinc-400">Letöltés</span>
                   {c.status === "DRAFT" ? (
                     <form action={updateContractStatusAction.bind(null, c.id, "SENT")}>
-                      <button className="text-indigo-600 hover:underline">Elküldés</button>
+                      <button className="text-brand-gold hover:underline">Elküldés</button>
                     </form>
                   ) : null}
                   {c.status === "SENT" ? (
                     <form action={updateContractStatusAction.bind(null, c.id, "VIEWED")}>
-                      <button className="text-indigo-600 hover:underline">Megtekintve</button>
+                      <button className="text-brand-gold hover:underline">Megtekintve</button>
                     </form>
                   ) : null}
                   {c.status === "VIEWED" ? (
                     <form action={updateContractStatusAction.bind(null, c.id, "SIGNED")}>
-                      <button className="text-emerald-600 hover:underline">Aláírva</button>
+                      <button className="text-brand-gold hover:underline">Aláírva</button>
                     </form>
                   ) : null}
                 </div>

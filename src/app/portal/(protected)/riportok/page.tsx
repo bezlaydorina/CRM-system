@@ -19,7 +19,7 @@ export default async function PortalReportsPage() {
           <form action={generateManualReportAction}>
             <button
               disabled={manualRemaining === 0}
-              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-40"
+              className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-40"
               title={manualRemaining === 0 ? "Nincs több manuális riport ebben a hónapban" : ""}
             >
               Manuális riport generálása ({manualRemaining} maradt)
@@ -42,7 +42,7 @@ export default async function PortalReportsPage() {
               </div>
               <div className="flex items-center gap-2">
                 {r.isAutomatic ? <Badge color="gray">Automata</Badge> : <Badge color="indigo">Manuális</Badge>}
-                <a href={`/report/${r.shareToken}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-emerald-600 hover:underline">
+                <a href={`/report/${r.shareToken}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-brand-gold hover:underline">
                   Megnyitás
                 </a>
                 <span className="text-xs text-zinc-400">Email</span>

@@ -12,7 +12,7 @@ export default function NewAccountPage() {
         <PageHeader title="Új ügyfél létrehozása" subtitle="Meeting közben? Használd a Gyorsmentést, a csomagot később is pótolhatod." />
       </div>
 
-      <div className="mb-4 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2 text-sm text-indigo-700">
+      <div className="mb-4 rounded-lg border border-brand-gold/15 bg-brand-gold/10 px-4 py-2 text-sm text-brand-gold-dark">
         <strong>Tipp:</strong> az új ügyfél form gépen kényelmesebb, de telefonon is kitöltheted, minden adat ugyanúgy mentődik.
       </div>
 

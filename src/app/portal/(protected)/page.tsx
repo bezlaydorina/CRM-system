@@ -50,7 +50,7 @@ export default async function PortalHomePage() {
         <Card className="mt-6">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-700">Legutóbbi heti riport kivonata</h2>
-            <Link href="/portal/riportok" className="text-xs font-medium text-emerald-600 hover:underline">
+            <Link href="/portal/riportok" className="text-xs font-medium text-brand-gold hover:underline">
               Összes riport →
             </Link>
           </div>
@@ -81,7 +81,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
 function QuickLink({ href, title, desc }: { href: string; title: string; desc: string }) {
   return (
     <Link href={href} className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-sm hover:shadow-md">
-      <p className="text-sm font-semibold text-emerald-700">{title}</p>
+      <p className="text-sm font-semibold text-brand-gold-dark">{title}</p>
       <p className="mt-0.5 text-xs text-zinc-500">{desc}</p>
     </Link>
   );

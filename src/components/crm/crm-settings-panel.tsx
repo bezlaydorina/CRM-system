@@ -62,7 +62,7 @@ export function CrmSettingsPanel({
                 <Badge color="indigo">Alapértelmezett</Badge>
               ) : (
                 <form action={setDefaultPipelineAction.bind(null, accountId, p.id)}>
-                  <button className="text-xs text-indigo-600 hover:underline">Legyen alapértelmezett</button>
+                  <button className="text-xs text-brand-gold hover:underline">Legyen alapértelmezett</button>
                 </form>
               )}
             </div>
@@ -154,7 +154,7 @@ export function CrmSettingsPanel({
                 <span className="font-medium text-zinc-700">{w.name}</span>
                 <span className="flex gap-2">
                   <form action={regenerateWebhookAction.bind(null, w.id)}>
-                    <button className="text-indigo-600 hover:underline">Újragenerálás</button>
+                    <button className="text-brand-gold hover:underline">Újragenerálás</button>
                   </form>
                   <form action={deleteWebhookAction.bind(null, w.id)}>
                     <button className="text-red-600 hover:underline">Törlés</button>

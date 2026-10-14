@@ -36,7 +36,7 @@ export default async function PortalSettingsPage() {
                 <span className="text-xs text-zinc-500">Email (nem módosítható)</span>
                 <input disabled value={me.email ?? ""} className="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-zinc-400" />
               </label>
-              <button className="rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white">Mentés</button>
+              <button className="rounded-lg bg-brand-gold px-3 py-1.5 font-semibold text-white">Mentés</button>
             </form>
           ) : (
             <p className="text-sm text-zinc-400">Admin nézetben nincs szerkeszthető profil.</p>

@@ -29,7 +29,7 @@ export function AssistantChat() {
       <div className="flex-1 space-y-3 overflow-y-auto">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-md rounded-2xl px-3 py-2 text-sm ${m.role === "user" ? "bg-emerald-600 text-white" : "bg-zinc-100 text-zinc-800"}`}>
+            <div className={`max-w-md rounded-2xl px-3 py-2 text-sm ${m.role === "user" ? "bg-brand-gold text-white" : "bg-zinc-100 text-zinc-800"}`}>
               {m.text}
             </div>
           </div>
@@ -39,7 +39,7 @@ export function AssistantChat() {
 
       <div className="mt-3 flex flex-wrap gap-2">
         {SUGGESTIONS.map((s) => (
-          <button key={s} onClick={() => ask(s)} className="rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-700 hover:bg-emerald-100">
+          <button key={s} onClick={() => ask(s)} className="rounded-full bg-brand-gold/10 px-3 py-1 text-xs text-brand-gold-dark hover:bg-brand-gold/15">
             {s}
           </button>
         ))}
@@ -58,7 +58,7 @@ export function AssistantChat() {
           placeholder="Kérdezz valamit..."
           className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm"
         />
-        <button className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Küldés</button>
+        <button className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white">Küldés</button>
       </form>
     </div>
   );

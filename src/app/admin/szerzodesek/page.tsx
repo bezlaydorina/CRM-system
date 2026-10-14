@@ -28,7 +28,7 @@ export default async function ContractsPage() {
             </select>
             <input name="amount" type="number" placeholder="Összeg (Ft)" required className="rounded-lg border border-zinc-300 px-2 py-1.5" />
             <input name="templateName" placeholder="Sablon neve" defaultValue="Alap szolgáltatási szerződés" className="rounded-lg border border-zinc-300 px-2 py-1.5" />
-            <button className="rounded-lg bg-indigo-600 px-3 py-1.5 font-semibold text-white">Létrehozás (Konfigurátor)</button>
+            <button className="rounded-lg bg-brand-gold px-3 py-1.5 font-semibold text-white">Létrehozás (Konfigurátor)</button>
           </form>
         </Card>
       </div>

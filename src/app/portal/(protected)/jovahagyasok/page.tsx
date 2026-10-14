@@ -22,7 +22,7 @@ export default async function PortalApprovalsPage({ searchParams }: { searchPara
           <Link
             key={t.key}
             href={`/portal/jovahagyasok?type=${t.key}`}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${type === t.key ? "bg-emerald-600 text-white" : "bg-zinc-100 text-zinc-600"}`}
+            className={`rounded-full px-3 py-1 text-xs font-medium ${type === t.key ? "bg-brand-gold text-white" : "bg-zinc-100 text-zinc-600"}`}
           >
             {t.label}
           </Link>

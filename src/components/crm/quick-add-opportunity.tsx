@@ -11,7 +11,7 @@ export function QuickAddOpportunity({ accountId, stageId }: { accountId: string;
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-lg border border-dashed border-zinc-300 px-2 py-1.5 text-xs font-medium text-zinc-500 hover:border-indigo-400 hover:text-indigo-600"
+        className="w-full rounded-lg border border-dashed border-zinc-300 px-2 py-1.5 text-xs font-medium text-zinc-500 hover:border-brand-gold/80 hover:text-brand-gold"
       >
         + Új opportunity
       </button>
@@ -26,12 +26,12 @@ export function QuickAddOpportunity({ accountId, stageId }: { accountId: string;
           setOpen(false);
         })
       }
-      className="space-y-1 rounded-lg border border-indigo-200 bg-white p-2 shadow-sm"
+      className="space-y-1 rounded-lg border border-brand-gold/30 bg-white p-2 shadow-sm"
     >
       <input name="firstName" placeholder="Keresztnév *" required className="w-full rounded-md border border-zinc-300 px-2 py-1 text-xs" />
       <input name="phone" placeholder="Telefon" className="w-full rounded-md border border-zinc-300 px-2 py-1 text-xs" />
       <div className="flex gap-1">
-        <button type="submit" className="flex-1 rounded-md bg-indigo-600 px-2 py-1 text-xs font-medium text-white">
+        <button type="submit" className="flex-1 rounded-md bg-brand-gold px-2 py-1 text-xs font-medium text-white">
           Mentés
         </button>
         <button type="button" onClick={() => setOpen(false)} className="rounded-md border border-zinc-300 px-2 py-1 text-xs">

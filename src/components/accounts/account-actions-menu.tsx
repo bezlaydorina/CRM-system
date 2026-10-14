@@ -67,7 +67,7 @@ export function AccountActionsMenu({ accountId, primaryContactId }: { accountId:
                   setOpen(false);
                   setShowPasswordForm(false);
                 }}
-                className="rounded-md bg-indigo-600 px-2 py-1 text-sm font-medium text-white"
+                className="rounded-md bg-brand-gold px-2 py-1 text-sm font-medium text-white"
               >
                 Mentés
               </button>

@@ -23,7 +23,7 @@ export default async function PortalFilesPage() {
             <option value="VIDEOS">Videó</option>
             <option value="OTHER">Egyéb</option>
           </select>
-          <button className="rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white">Feltöltés</button>
+          <button className="rounded-lg bg-brand-gold px-4 py-1.5 text-sm font-semibold text-white">Feltöltés</button>
         </form>
       </Card>
 

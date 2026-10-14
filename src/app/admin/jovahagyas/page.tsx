@@ -35,7 +35,7 @@ export default async function CsmApprovalPage({
             key={t.key}
             href={`/admin/jovahagyas?type=${t.key}&state=${state}&accountId=${accountId}`}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              type === t.key ? "bg-indigo-600 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              type === t.key ? "bg-brand-gold text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
             }`}
           >
             {t.label}

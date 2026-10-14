@@ -80,7 +80,7 @@ export default async function UgyfelekPage({
             </Link>
             <Link
               href="/admin/ugyfelek/uj"
-              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500"
+              className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-gold-dark"
             >
               + Új ügyfél
             </Link>
@@ -95,7 +95,7 @@ export default async function UgyfelekPage({
             name="q"
             defaultValue={q}
             placeholder="Keresés cégnév szerint..."
-            className="w-64 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:outline-none"
+            className="w-64 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-gold focus:outline-none"
           />
           <select name="status" defaultValue={status} className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm">
             <option value="ACTIVE">Aktív</option>

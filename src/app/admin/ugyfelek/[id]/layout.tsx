@@ -27,7 +27,7 @@ export default async function AccountDetailLayout({
       <div className="mb-4 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className={`h-2.5 w-2.5 rounded-full ${account.status === "ACTIVE" ? "bg-emerald-500" : "bg-zinc-400"}`} />
+            <span className={`h-2.5 w-2.5 rounded-full ${account.status === "ACTIVE" ? "bg-green-500" : "bg-zinc-400"}`} />
             <h1 className="text-xl font-semibold text-zinc-900">{account.name}</h1>
             {account.isTestAccount ? <Badge color="purple">Teszt fiók</Badge> : null}
           </div>

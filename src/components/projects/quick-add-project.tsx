@@ -21,7 +21,7 @@ export function QuickAddProject({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500"
+        className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-gold-dark"
       >
         + Új projekt
       </button>
@@ -36,7 +36,7 @@ export function QuickAddProject({
           setOpen(false);
         })
       }
-      className="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-indigo-200 bg-indigo-50/50 p-3 sm:grid-cols-3 lg:grid-cols-6"
+      className="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-brand-gold/30 bg-brand-gold/10/50 p-3 sm:grid-cols-3 lg:grid-cols-6"
     >
       <select name="accountId" required className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm">
         <option value="">Ügyfél...</option>
@@ -58,7 +58,7 @@ export function QuickAddProject({
         ))}
       </select>
       <div className="col-span-2 flex gap-2 sm:col-span-3 lg:col-span-6">
-        <button type="submit" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white">
+        <button type="submit" className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white">
           Létrehozás
         </button>
         <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm">

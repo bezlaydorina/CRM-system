@@ -57,7 +57,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
                 <option value="DEPOSIT">Előleg</option>
               </select>
               <input name="dueDate" type="date" className="rounded-lg border border-zinc-300 px-2 py-1.5" />
-              <button className="rounded-lg bg-indigo-600 px-3 py-1.5 font-semibold text-white">Létrehozás</button>
+              <button className="rounded-lg bg-brand-gold px-3 py-1.5 font-semibold text-white">Létrehozás</button>
             </form>
           </Card>
         </div>

@@ -10,6 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brand palette: Éjszakai bordó, Antik arany, Háttér, Kiegészítő */
+  --color-brand-maroon: #32101f;
+  --color-brand-gold: #a8874f;
+  --color-brand-gold-dark: #8c6f3f;
+  --color-brand-bg: #f3eee7;
+  --color-brand-plum: #583044;
 }
 
 body {

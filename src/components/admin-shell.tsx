@@ -39,26 +39,26 @@ export function AdminShell({
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-zinc-100">
-      <aside className="flex w-64 flex-shrink-0 flex-col bg-indigo-950 text-white">
+    <div className="flex min-h-screen w-full bg-brand-bg">
+      <aside className="flex w-64 flex-shrink-0 flex-col bg-brand-maroon text-white">
         <div className="flex items-center gap-2 px-4 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm font-bold">T</div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold">T</div>
           <div>
             <p className="text-sm font-semibold leading-tight">The Code</p>
-            <p className="text-[11px] text-indigo-300 leading-tight">Admin felület</p>
+            <p className="text-[11px] text-white/50 leading-tight">Admin felület</p>
           </div>
         </div>
 
         <div className="mx-3 mb-3 flex rounded-lg bg-white/5 p-1 text-xs font-semibold">
           <Link
             href="/admin"
-            className={`flex-1 rounded-md px-2 py-1.5 text-center ${!isSales ? "bg-indigo-500 text-white" : "text-indigo-300 hover:text-white"}`}
+            className={`flex-1 rounded-md px-2 py-1.5 text-center ${!isSales ? "bg-brand-gold text-white" : "text-white/50 hover:text-white"}`}
           >
             Service
           </Link>
           <Link
             href="/admin/sales"
-            className={`flex-1 rounded-md px-2 py-1.5 text-center ${isSales ? "bg-indigo-500 text-white" : "text-indigo-300 hover:text-white"}`}
+            className={`flex-1 rounded-md px-2 py-1.5 text-center ${isSales ? "bg-brand-gold text-white" : "text-white/50 hover:text-white"}`}
           >
             Sales
           </Link>
@@ -110,10 +110,10 @@ export function AdminShell({
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold">{member.name}</p>
-              <p className="truncate text-[11px] text-indigo-300">{member.jobRole}</p>
+              <p className="truncate text-[11px] text-white/50">{member.jobRole}</p>
             </div>
             <form action={logoutAction}>
-              <button title="Kijelentkezés" className="text-indigo-300 hover:text-white">
+              <button title="Kijelentkezés" className="text-white/50 hover:text-white">
                 ⏻
               </button>
             </form>
@@ -133,7 +133,7 @@ export function AdminShell({
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 150)}
               placeholder="Admin nézet – keress ügyfelet..."
-              className="w-full rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-gold focus:outline-none"
             />
             {open && query && (
               <div className="absolute z-20 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg">
@@ -145,7 +145,7 @@ export function AdminShell({
                       <input type="hidden" name="accountId" value={a.id} />
                       <button
                         type="submit"
-                        className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-indigo-50"
+                        className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-brand-gold/10"
                       >
                         <span>{a.name}</span>
                         <span className="text-[10px] text-zinc-400">{a.status === "ACTIVE" ? "Aktív" : "Archív"}</span>

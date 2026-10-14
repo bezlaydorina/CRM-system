@@ -113,7 +113,7 @@ export default async function TasksPage({
             key={c}
             href={`/admin/feladatok?assignee=${assignee}&category=${encodeURIComponent(c)}`}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              category === c ? "bg-indigo-600 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              category === c ? "bg-brand-gold text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
             }`}
           >
             {c} {c !== "Mind" ? `(${categoryCounts[c] ?? 0})` : `(${allTasksForAssignee.length})`}

@@ -22,7 +22,7 @@ export function NavLink({
       href={href}
       className={clsx(
         "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-        active ? "bg-white/10 text-white" : "text-indigo-200 hover:bg-white/5 hover:text-white"
+        active ? "bg-brand-plum text-white" : "text-white/50 hover:bg-white/5 hover:text-white"
       )}
     >
       {children}

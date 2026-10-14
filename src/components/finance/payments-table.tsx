@@ -45,17 +45,17 @@ export function PaymentsTable({ payments }: { payments: PaymentRow[] }) {
                 </Badge>
               </td>
               <td className="px-4 py-2 text-zinc-500">{p.dueDate ? p.dueDate.toLocaleDateString("hu-HU") : "—"}</td>
-              <td className="px-4 py-2 text-xs text-indigo-500">fizetési link</td>
+              <td className="px-4 py-2 text-xs text-brand-gold">fizetési link</td>
               <td className="px-4 py-2">
                 <div className="flex gap-1">
                   {p.status !== "PAID" ? (
                     <form action={updatePaymentStatusAction.bind(null, p.id, "PAID")}>
-                      <button className="text-xs text-emerald-600 hover:underline">Fizetve</button>
+                      <button className="text-xs text-brand-gold hover:underline">Fizetve</button>
                     </form>
                   ) : null}
                   {p.status === "CREATED" ? (
                     <form action={updatePaymentStatusAction.bind(null, p.id, "SENT")}>
-                      <button className="text-xs text-indigo-600 hover:underline">Elküldve</button>
+                      <button className="text-xs text-brand-gold hover:underline">Elküldve</button>
                     </form>
                   ) : null}
                 </div>

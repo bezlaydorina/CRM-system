@@ -45,7 +45,7 @@ export function MilestoneCelebration({ accountId }: { accountId: string }) {
         <p className="mt-1 text-sm text-zinc-500">Mostantól élőben követheted a projektjeid állását itt a kezdőlapon.</p>
         <button
           onClick={() => setShow(false)}
-          className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
+          className="mt-4 rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white"
         >
           Szuper!
         </button>
