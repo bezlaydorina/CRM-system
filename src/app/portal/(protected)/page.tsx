@@ -34,7 +34,7 @@ export default async function PortalHomePage() {
     <div>
       {isAccountLive(account.lifecycleStage) ? <MilestoneCelebration accountId={account.id} /> : null}
 
-      <h1 className="text-xl font-semibold text-zinc-900">Szép napot, {primaryContact?.fullName.split(" ")[0] ?? "!"}!</h1>
+      <h1 className="text-xl font-semibold text-brand-text">Szép napot, {primaryContact?.fullName.split(" ")[0] ?? "!"}!</h1>
       <p className="mt-1 text-sm text-zinc-500">{account.name}</p>
 
       <h2 className="mt-5 text-sm font-semibold text-zinc-700">Projekt áttekintés</h2>
@@ -73,7 +73,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <Card>
       <p className="text-xs font-medium text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-zinc-900">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-brand-text">{value}</p>
     </Card>
   );
 }

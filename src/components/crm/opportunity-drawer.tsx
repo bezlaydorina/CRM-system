@@ -39,7 +39,7 @@ export function OpportunityDrawer({ opportunityId, onClose }: { opportunityId: s
           <div>
             <div className="flex items-start justify-between border-b border-zinc-100 p-4">
               <div>
-                <h2 className="text-base font-semibold text-zinc-900">
+                <h2 className="text-base font-semibold text-brand-text">
                   {detail.firstName} {detail.lastName}
                 </h2>
                 <p className="text-xs text-zinc-500">{detail.opportunityName}</p>

@@ -41,7 +41,7 @@ export function MilestoneCelebration({ accountId }: { accountId: string }) {
           ))}
         </div>
         <p className="text-3xl">🎉</p>
-        <h2 className="mt-2 text-lg font-semibold text-zinc-900">Elindult az együttműködésünk!</h2>
+        <h2 className="mt-2 text-lg font-semibold text-brand-text">Elindult az együttműködésünk!</h2>
         <p className="mt-1 text-sm text-zinc-500">Mostantól élőben követheted a projektjeid állását itt a kezdőlapon.</p>
         <button
           onClick={() => setShow(false)}

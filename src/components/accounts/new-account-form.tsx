@@ -83,7 +83,7 @@ export function NewAccountForm() {
               )}
             >
               <span className="flex items-center justify-between">
-                <span className="text-base font-bold uppercase text-zinc-900">{p.label}</span>
+                <span className="text-base font-bold uppercase text-brand-text">{p.label}</span>
                 {packageKey === p.key ? <Badge color="indigo">Kiválasztva</Badge> : null}
               </span>
               <p className="mt-2 text-xs text-zinc-500">{p.description}</p>
@@ -92,7 +92,7 @@ export function NewAccountForm() {
               ) : (
                 <>
                   <span className="mt-3 text-xs font-medium uppercase text-zinc-400">Havidíj</span>
-                  <span className="text-lg font-bold text-zinc-900">{formatHUF(p.monthlyFee)}</span>
+                  <span className="text-lg font-bold text-brand-text">{formatHUF(p.monthlyFee)}</span>
                   <span className="mt-1 text-xs font-medium uppercase text-zinc-400">Setup</span>
                   <span className="text-sm font-semibold text-zinc-700">{formatHUF(p.setupFee)}</span>
                 </>
@@ -150,7 +150,7 @@ export function NewAccountForm() {
 
       <div className="sticky bottom-4 flex items-center justify-between rounded-xl border border-zinc-200 bg-white/95 p-4 shadow-lg backdrop-blur">
         <div className="text-sm text-zinc-600">
-          Összesen: <span className="font-semibold text-zinc-900">{formatHUF(monthlyFee)} / hó</span> + <span className="font-semibold text-zinc-900">{formatHUF(setupFee)} setup</span>
+          Összesen: <span className="font-semibold text-brand-text">{formatHUF(monthlyFee)} / hó</span> + <span className="font-semibold text-brand-text">{formatHUF(setupFee)} setup</span>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/admin/ugyfelek" className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">

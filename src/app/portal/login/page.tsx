@@ -9,13 +9,13 @@ export default async function ClientLoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-gradient-to-br from-brand-maroon to-brand-plum px-4">
+    <div className="flex flex-1 items-center justify-center bg-gradient-to-br from-brand-maroon to-brand-text px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gold text-lg font-bold text-white">
             T
           </div>
-          <h1 className="text-xl font-semibold text-zinc-900">Ügyfélportál</h1>
+          <h1 className="text-xl font-semibold text-brand-text">Ügyfélportál</h1>
           <p className="mt-1 text-sm text-zinc-500">Jelentkezz be a saját fiókodba</p>
         </div>
         {error ? (

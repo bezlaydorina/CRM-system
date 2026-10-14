@@ -9,7 +9,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-5 flex items-start justify-between gap-4">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{title}</h1>
+        <h1 className="text-xl font-semibold text-brand-text">{title}</h1>
         {subtitle ? <p className="mt-0.5 text-sm text-zinc-500">{subtitle}</p> : null}
       </div>
       {actions}
