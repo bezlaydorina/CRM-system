@@ -5,50 +5,24 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Card, Badge } from "@/components/ui";
 import { quickSaveAccountAction, createFullAccountAction } from "@/lib/actions/account-actions";
-import {
-  ACCOUNT_PACKAGES,
-  AI_MODULES,
-  HARDWARE_COMPUTERS,
-  HARDWARE_MONITORS,
-  HARDWARE_SETUP_FEE,
-  ONBOARDING_ADDONS,
-  INDUSTRIES,
-  formatHUF,
-} from "@/lib/enums";
+import { ACCOUNT_PACKAGES, INDUSTRIES, formatHUF } from "@/lib/enums";
 
 export function NewAccountForm() {
-  const [packageKey, setPackageKey] = useState<string>("AGENCY");
-  const [aiModule, setAiModule] = useState<string>("");
-  const [computer, setComputer] = useState<string>("");
-  const [monitor, setMonitor] = useState<string>("");
-  const [addons, setAddons] = useState<string[]>([]);
+  const [packageKey, setPackageKey] = useState<string>("GROWTH");
+  const [customMonthlyFee, setCustomMonthlyFee] = useState(0);
+  const [customSetupFee, setCustomSetupFee] = useState(0);
   const [wantsPassword, setWantsPassword] = useState(false);
 
   const pkg = ACCOUNT_PACKAGES.find((p) => p.key === packageKey) ?? null;
 
   const { monthlyFee, setupFee } = useMemo(() => {
-    let monthly = pkg?.monthlyFee ?? 0;
-    let setup = pkg?.setupFee ?? 0;
-    if (computer || monitor) setup += HARDWARE_SETUP_FEE;
-    for (const key of addons) {
-      const addon = ONBOARDING_ADDONS.find((a) => a.key === key);
-      if (!addon) continue;
-      if (addon.billing === "MONTHLY") monthly += addon.price;
-      else setup += addon.price;
-    }
-    return { monthlyFee: monthly, setupFee: setup };
-  }, [pkg, computer, monitor, addons]);
-
-  function toggleAddon(key: string) {
-    setAddons((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-  }
+    if (pkg?.custom) return { monthlyFee: customMonthlyFee, setupFee: customSetupFee };
+    return { monthlyFee: pkg?.monthlyFee ?? 0, setupFee: pkg?.setupFee ?? 0 };
+  }, [pkg, customMonthlyFee, customSetupFee]);
 
   return (
     <form action={createFullAccountAction} className="space-y-6">
       <input type="hidden" name="package" value={packageKey} />
-      <input type="hidden" name="aiModule" value={aiModule} />
-      <input type="hidden" name="computer" value={computer} />
-      <input type="hidden" name="monitor" value={monitor} />
 
       <Card>
         <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-700">🏢 Ügyfél adatok</h2>
@@ -113,99 +87,46 @@ export function NewAccountForm() {
                 {packageKey === p.key ? <Badge color="indigo">Kiválasztva</Badge> : null}
               </span>
               <p className="mt-2 text-xs text-zinc-500">{p.description}</p>
-              <span className="mt-3 text-xs font-medium uppercase text-zinc-400">Havidíj</span>
-              <span className="text-lg font-bold text-zinc-900">{formatHUF(p.monthlyFee)}</span>
-              <span className="mt-1 text-xs font-medium uppercase text-zinc-400">Setup</span>
-              <span className="text-sm font-semibold text-zinc-700">{formatHUF(p.setupFee)}</span>
+              {p.custom ? (
+                <span className="mt-3 text-sm font-semibold text-zinc-700">Egyedi ajánlat</span>
+              ) : (
+                <>
+                  <span className="mt-3 text-xs font-medium uppercase text-zinc-400">Havidíj</span>
+                  <span className="text-lg font-bold text-zinc-900">{formatHUF(p.monthlyFee)}</span>
+                  <span className="mt-1 text-xs font-medium uppercase text-zinc-400">Setup</span>
+                  <span className="text-sm font-semibold text-zinc-700">{formatHUF(p.setupFee)}</span>
+                </>
+              )}
             </button>
           ))}
         </div>
-      </Card>
 
-      <Card>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-700">
-          ⚙️ AI modul <span className="text-xs font-normal text-zinc-400">(opcionális)</span>
-        </h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {AI_MODULES.map((m) => (
-            <button
-              key={m.key}
-              type="button"
-              onClick={() => setAiModule((prev) => (prev === m.key ? "" : m.key))}
-              className={clsx(
-                "rounded-xl border-2 p-3 text-center transition",
-                aiModule === m.key ? "border-indigo-600 bg-indigo-50" : "border-zinc-200 hover:border-zinc-300"
-              )}
-            >
-              <p className="text-sm font-semibold text-zinc-900">{m.label}</p>
-              <p className="text-xs text-zinc-400">{m.vendor}</p>
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      <Card>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-700">
-          🖥️ Ajándék hardver <span className="text-xs font-normal text-zinc-400">(opcionális +{formatHUF(HARDWARE_SETUP_FEE)} setup)</span>
-        </h2>
-        <p className="mb-2 text-xs font-semibold uppercase text-zinc-400">Számítógép</p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {HARDWARE_COMPUTERS.map((c) => (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => setComputer((prev) => (prev === c.key ? "" : c.key))}
-              className={clsx(
-                "rounded-lg border-2 px-3 py-2 text-left text-sm transition",
-                computer === c.key ? "border-indigo-600 bg-indigo-50 font-medium text-zinc-900" : "border-zinc-200 text-zinc-700 hover:border-zinc-300"
-              )}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
-        <p className="mb-2 mt-4 text-xs font-semibold uppercase text-zinc-400">Monitor</p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {HARDWARE_MONITORS.map((m) => (
-            <button
-              key={m.key}
-              type="button"
-              onClick={() => setMonitor((prev) => (prev === m.key ? "" : m.key))}
-              className={clsx(
-                "rounded-lg border-2 px-3 py-2 text-left text-sm transition",
-                monitor === m.key ? "border-indigo-600 bg-indigo-50 font-medium text-zinc-900" : "border-zinc-200 text-zinc-700 hover:border-zinc-300"
-              )}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      <Card>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-700">+ Extra bővítmények</h2>
-        <div className="space-y-2">
-          {ONBOARDING_ADDONS.map((a) => (
-            <label
-              key={a.key}
-              className={clsx(
-                "flex items-start justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition",
-                addons.includes(a.key) ? "border-indigo-300 bg-indigo-50/60" : "border-zinc-100 hover:bg-zinc-50"
-              )}
-            >
-              <span className="flex items-start gap-2">
-                <input type="checkbox" name="addons" value={a.key} checked={addons.includes(a.key)} onChange={() => toggleAddon(a.key)} className="mt-0.5 h-4 w-4" />
-                <span>
-                  <span className="font-medium text-zinc-800">{a.label}</span>
-                  <p className="text-xs text-zinc-500">{a.description}</p>
-                </span>
-              </span>
-              <Badge color="gray">
-                +{formatHUF(a.price)} {a.billing === "MONTHLY" ? "/ hó" : "(egyszeri)"}
-              </Badge>
+        {pkg?.custom ? (
+          <div className="mt-4 grid grid-cols-2 gap-3 border-t border-zinc-100 pt-4">
+            <label className="text-sm font-medium text-zinc-700">
+              Egyedi havidíj (Ft)
+              <input
+                name="customMonthlyFee"
+                type="number"
+                min={0}
+                value={customMonthlyFee}
+                onChange={(e) => setCustomMonthlyFee(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
             </label>
-          ))}
-        </div>
+            <label className="text-sm font-medium text-zinc-700">
+              Egyedi setup díj (Ft)
+              <input
+                name="customSetupFee"
+                type="number"
+                min={0}
+                value={customSetupFee}
+                onChange={(e) => setCustomSetupFee(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </label>
+          </div>
+        ) : null}
       </Card>
 
       <Card>

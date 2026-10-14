@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireStaffSession } from "@/lib/auth";
 import { hashPassword } from "@/lib/password";
 import { createDefaultCrmSetup } from "@/lib/tenant-setup";
-import { ACCOUNT_LIFECYCLE_STAGES, ACCOUNT_PACKAGES, ONBOARDING_ADDONS, HARDWARE_SETUP_FEE } from "@/lib/enums";
+import { ACCOUNT_LIFECYCLE_STAGES, ACCOUNT_PACKAGES } from "@/lib/enums";
 
 export async function moveAccountStage(accountId: string, newStage: string) {
   await requireStaffSession();
@@ -104,7 +104,7 @@ export async function quickSaveAccountAction(formData: FormData) {
   redirect(`/admin/ugyfelek/${account.id}`);
 }
 
-/** Teljes létrehozás: csomag, AI modul, ajándék hardver és extra bővítmények alapján kiszámolt díjakkal. */
+/** Teljes létrehozás: a kiválasztott csomag (vagy a Next Level egyedi ajánlata) alapján kiszámolt díjakkal. */
 export async function createFullAccountAction(formData: FormData) {
   const session = await requireStaffSession();
   const name = String(formData.get("name") ?? "").trim();
@@ -112,19 +112,9 @@ export async function createFullAccountAction(formData: FormData) {
   if (!name || !email || !fullName) return;
 
   const pkg = ACCOUNT_PACKAGES.find((p) => p.key === String(formData.get("package") ?? "")) ?? null;
-  const aiModule = String(formData.get("aiModule") ?? "") || null;
-  const computer = String(formData.get("computer") ?? "") || null;
-  const monitor = String(formData.get("monitor") ?? "") || null;
-  const addonKeys = formData.getAll("addons").map(String);
-  const addons = ONBOARDING_ADDONS.filter((a) => addonKeys.includes(a.key));
 
-  let monthlyFee = pkg?.monthlyFee ?? 0;
-  let setupFee = pkg?.setupFee ?? 0;
-  if (computer || monitor) setupFee += HARDWARE_SETUP_FEE;
-  for (const addon of addons) {
-    if (addon.billing === "MONTHLY") monthlyFee += addon.price;
-    else setupFee += addon.price;
-  }
+  const monthlyFee = pkg?.custom ? Number(formData.get("customMonthlyFee") ?? 0) : pkg?.monthlyFee ?? 0;
+  const setupFee = pkg?.custom ? Number(formData.get("customSetupFee") ?? 0) : pkg?.setupFee ?? 0;
 
   const contractSignedRaw = String(formData.get("contractSignedAt") ?? "");
   const contractSignedAt = contractSignedRaw ? new Date(contractSignedRaw) : null;
@@ -139,8 +129,6 @@ export async function createFullAccountAction(formData: FormData) {
       setupFee,
       contractSignedAt,
       package: pkg?.key ?? null,
-      aiModule,
-      onboardingExtras: JSON.stringify({ hardware: { computer, monitor }, addons: addonKeys }),
     },
   });
 
