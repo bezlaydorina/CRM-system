@@ -5,15 +5,30 @@ Multi-tenant ügynökségi CRM + fehér-címkés ügyfélportál, a `The Code CR
 ## Tech stack
 
 - Next.js 16 (App Router) + TypeScript + Tailwind CSS
-- Prisma + SQLite (dev adatbázis, `prisma/dev.db`) — `DATABASE_URL`-lel könnyen Postgres-re állítható
+- Prisma + PostgreSQL (lásd lent az éles telepítést Supabase-szel)
 - Saját JWT-cookie alapú session (`jose`), nincs külső auth szolgáltató
 - `@dnd-kit` a Kanban drag&drop táblákhoz (ügyfél életciklus, CRM pipeline, feladatok)
 
-## Indítás
+## Indítás (helyi fejlesztés)
+
+Kell egy helyi (vagy bármilyen elérhető) Postgres adatbázis. Ha nincs:
+
+```bash
+sudo service postgresql start
+sudo -u postgres psql -c "CREATE DATABASE crm_dev;"
+```
+
+Majd `.env`-ben állítsd be (lásd `.env.example`):
+
+```
+DATABASE_URL="postgresql://postgres:<jelszó>@localhost:5432/crm_dev"
+DIRECT_URL="postgresql://postgres:<jelszó>@localhost:5432/crm_dev"
+SESSION_SECRET="<bármilyen hosszú random string>"
+```
 
 ```bash
 npm install
-npx prisma migrate dev   # létrehozza a dev.db-t és a táblákat
+npx prisma migrate dev   # létrehozza a táblákat
 npm run db:seed          # demó ügynökség, csapat, 13 ügyfél, leadek, feladatok, stb.
 npm run dev
 ```
@@ -32,10 +47,24 @@ Minden csapattag jelszava `thecode123`, minden ügyfél elsődleges kontaktjáé
 
 Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyithatod ("nézd, amit ő lát" impersonáció) – a sárga sáv "Vissza a saját főoldalra" gombjával lépsz ki belőle.
 
+## Éles telepítés (Supabase + Vercel)
+
+1. **Supabase projekt létrehozása** – [supabase.com](https://supabase.com), új projekt, jegyezd fel az adatbázis jelszavát.
+2. **Connection stringek** – Project Settings → Database → Connection string:
+   - *Transaction pooler* (port 6543) → ez lesz a Vercel `DATABASE_URL`-je (az app futásidejű lekérdezései ezen mennek, `?pgbouncer=true` paraméterrel).
+   - *Direct connection* (port 5432) → ez lesz a Vercel `DIRECT_URL`-je (ezen fut a `prisma migrate deploy` build közben).
+3. **Vercel projekt** – [vercel.com](https://vercel.com) → "Add New Project" → importáld a `bezlaydorina/CRM-system` GitHub repót, branch: `claude/crm-rendszer-tuu9xn` (vagy a végleges `main`, ha oda kerül).
+4. **Környezeti változók** (Vercel → Settings → Environment Variables):
+   - `DATABASE_URL` = a pooler connection string
+   - `DIRECT_URL` = a direct connection string
+   - `SESSION_SECRET` = egy hosszú random string (pl. `openssl rand -base64 32`)
+5. **Deploy** – a build parancs (`prisma migrate deploy && prisma generate && next build`, lásd `package.json`) minden deploy-nál automatikusan lefuttatja a függő migrációkat az éles adatbázison.
+6. **Seedelés (opcionális, csak első alkalommal)** – a demó adatok (`npm run db:seed`) kitalált ügyfeleket hoznak létre; éles induláshoz ezt át lehet hagyni, és az admin a "+ Új ügyfél" formmal viszi fel az első valós ügyfeleket. Ha mégis kellenek demó adatok a teszteléshez, a seedet a Supabase connection stringgel helyben kell futtatni (`DATABASE_URL=... DIRECT_URL=... npm run db:seed`), mert a Vercel build nem futtatja automatikusan.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen
-- **Ügyfelek** – Lista + 12 szakaszos életciklus Kanban (drag&drop), 5 fülös adatlap (Áttekintés / CRM és leadek / Adatok és űrlapok / Meta és szolgáltatások / Pénzügy), CSV export, jelszó módosítás, archiválás, törlés
+- **Ügyfelek** – Lista + 12 szakaszos életciklus Kanban (drag&drop), 5 fülös adatlap (Áttekintés / CRM és leadek / Adatok és űrlapok / Projektek és szolgáltatások / Pénzügy), CSV export, jelszó módosítás, archiválás, törlés
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
 - **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
@@ -48,14 +77,13 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
 
 Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session nem rendelkezik:
 
-- **Meta Ads / Conversion API** – az adatmodell és a UI megvan (`AdMetricSnapshot`, feature flagek), de a tényleges Meta OAuth és a live metrika-húzás helyén egy jól látható "fejlesztés alatt" panel van
 - **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/thecode-xxxxxx`)
 - **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
 - **Fizetési szolgáltató (Stripe/Barion/SimplePay)** – a `Payment` modell és a UI kész, de a "fizetési link" egy generált placeholder URL, nincs mögötte valós fizetési folyamat
 - **PWA telepítés** – nincs `manifest.json` / service worker még
 
-Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés – valóban működik, saját SQLite adatbázisra írva.
+Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás – valóban működik, saját Postgres adatbázisra írva.
 
 ## Adatmodell
 
-Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, AdMetricSnapshot, Credential) a specifikáció 3. fejezete alapján.
+Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, Credential) a specifikáció 3. fejezete alapján.
