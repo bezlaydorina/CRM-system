@@ -65,7 +65,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
         <Card className="overflow-x-auto p-0">
           <div className="border-b border-zinc-100 px-4 py-2 text-xs text-zinc-500">
             Havi bontású bevétel-összevezetés — a kézi rögzítésű tételek (setup, havi díj) és a tényleges befizetési
-            események (Stripe/GHL/kézi jelölés) automatikus összevetése az elmúlt 45 napban.
+            események (Barion/kézi jelölés) automatikus összevetése az elmúlt 45 napban.
           </div>
           <table className="w-full text-sm">
             <thead className="border-b border-zinc-200 bg-zinc-50 text-left text-xs font-semibold uppercase text-zinc-500">

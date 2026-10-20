@@ -1,6 +1,7 @@
 import { Card, Badge, EmptyState } from "@/components/ui";
-import { formatHUF, labelFor, PAYMENT_STATUSES } from "@/lib/enums";
+import { formatHUF, labelFor, PAYMENT_STATUSES, PAYMENT_TYPES } from "@/lib/enums";
 import { updatePaymentStatusAction } from "@/lib/actions/finance-actions";
+import { startPaymentCheckoutAction } from "@/lib/actions/payment-checkout-actions";
 
 type PaymentRow = {
   id: string;
@@ -38,27 +39,30 @@ export function PaymentsTable({ payments }: { payments: PaymentRow[] }) {
             <tr key={p.id}>
               <td className="px-4 py-2 font-medium text-zinc-800">{p.account.name}</td>
               <td className="px-4 py-2">{formatHUF(p.amount)}</td>
-              <td className="px-4 py-2 text-zinc-500">{p.type === "ONE_TIME" ? "Egyszeri" : p.type === "MONTHLY" ? "Havi" : "Előleg"}</td>
+              <td className="px-4 py-2 text-zinc-500">{labelFor(PAYMENT_TYPES, p.type)}</td>
               <td className="px-4 py-2">
                 <Badge color={p.status === "PAID" ? "green" : p.status === "EXPIRED" ? "red" : "amber"}>
                   {labelFor(PAYMENT_STATUSES, p.status)}
                 </Badge>
               </td>
               <td className="px-4 py-2 text-zinc-500">{p.dueDate ? p.dueDate.toLocaleDateString("hu-HU") : "—"}</td>
-              <td className="px-4 py-2 text-xs text-brand-gold">fizetési link</td>
               <td className="px-4 py-2">
-                <div className="flex gap-1">
-                  {p.status !== "PAID" ? (
-                    <form action={updatePaymentStatusAction.bind(null, p.id, "PAID")}>
-                      <button className="text-xs text-brand-gold hover:underline">Fizetve</button>
-                    </form>
-                  ) : null}
-                  {p.status === "CREATED" ? (
-                    <form action={updatePaymentStatusAction.bind(null, p.id, "SENT")}>
-                      <button className="text-xs text-brand-gold hover:underline">Elküldve</button>
-                    </form>
-                  ) : null}
-                </div>
+                {p.status !== "PAID" ? (
+                  <form action={startPaymentCheckoutAction.bind(null, p.id)}>
+                    <button className="text-xs font-medium text-brand-gold hover:underline">Fizetési link megnyitása</button>
+                  </form>
+                ) : (
+                  <span className="text-xs text-zinc-400">—</span>
+                )}
+              </td>
+              <td className="px-4 py-2">
+                {p.status !== "PAID" ? (
+                  <form action={updatePaymentStatusAction.bind(null, p.id, "PAID")}>
+                    <button className="text-xs text-brand-gold hover:underline" title="Pl. banki átutalásnál, Barion nélkül">
+                      Fizetve (manuálisan)
+                    </button>
+                  </form>
+                ) : null}
               </td>
             </tr>
           ))}

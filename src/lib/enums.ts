@@ -91,6 +91,12 @@ export const PAYMENT_STATUSES = [
   { key: "PENDING", label: "Várakozik" },
 ] as const;
 
+export const PAYMENT_TYPES = [
+  { key: "ONE_TIME", label: "Egyszeri" },
+  { key: "MONTHLY", label: "Havi" },
+  { key: "DEPOSIT", label: "Előleg" },
+] as const;
+
 export const PROJECT_CATEGORIES = [
   { key: "WEBOLDAL", label: "Weboldalak", slug: "weboldalak" },
   { key: "WEBSHOP", label: "Webshopok", slug: "webshopok" },

@@ -339,7 +339,8 @@ model Payment {
   type             String       @default("ONE_TIME") // ONE_TIME|MONTHLY|DEPOSIT
   status           String       @default("CREATED") // CREATED|SENT|PAID|EXPIRED|PENDING
   dueDate          DateTime?
-  paymentLink      String?
+  paymentLink      String? // legutóbb generált Barion GatewayUrl
+  barionPaymentId  String? // Barion PaymentId - a callback és az állapot-lekérdezés ezen keresztül azonosít
   depositRemaining Float?
   createdAt        DateTime     @default(now())
 }

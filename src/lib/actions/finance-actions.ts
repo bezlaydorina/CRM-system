@@ -24,7 +24,6 @@ export async function createPaymentAction(formData: FormData) {
       type: String(formData.get("type") ?? "ONE_TIME"),
       status: "CREATED",
       dueDate: formData.get("dueDate") ? new Date(String(formData.get("dueDate"))) : null,
-      paymentLink: `https://pay.thecode.hu/${accountId.slice(0, 8)}-${Date.now().toString(36)}`,
     },
   });
   revalidateFinanceSurfaces();

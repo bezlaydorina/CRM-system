@@ -33,6 +33,7 @@ export function PortalShell({
           <NavLink href="/portal/asszisztens">The Code asszisztens</NavLink>
           <NavLink href="/portal/riportok">Riportok</NavLink>
           <NavLink href="/portal/jovahagyasok">Jóváhagyások</NavLink>
+          <NavLink href="/portal/fizetesek">Fizetések</NavLink>
           <NavLink href="/portal/uzenetek">Üzenetek</NavLink>
           <NavLink href="/portal/fajlok">Képek feltöltése</NavLink>
           <NavLink href="/portal/crm">CRM</NavLink>

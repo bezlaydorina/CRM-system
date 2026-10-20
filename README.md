@@ -30,6 +30,12 @@ SESSION_SECRET="<bármilyen hosszú random string>"
 RESEND_API_KEY=""
 EMAIL_FROM="The Code <onboarding@resend.dev>"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Bankkártyás fizetéshez (Barion) - opcionális helyben:
+# BARION_POS_KEY nélkül a "Fizetés" gomb egy hibaüzenettel tér vissza, minden más működik.
+BARION_POS_KEY=""
+BARION_PAYEE_EMAIL=""
+BARION_ENV="test"
 ```
 
 ```bash
@@ -66,7 +72,8 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
    - `SESSION_SECRET` = egy hosszú random string (pl. `openssl rand -base64 32`)
    - `RESEND_API_KEY` = lásd az "Email küldés" szekciót lent – enélkül minden email (meghívók, jelszó-linkek, riport-email) kihagyásra kerül, a többi funkció változatlanul működik.
    - `EMAIL_FROM` = pl. `"The Code <onboarding@resend.dev>"` verifikált domain nélkül, vagy `"The Code <hello@thecode.hu>"` ha a domain már verifikálva van a Resende-ben.
-   - `NEXT_PUBLIC_APP_URL` = az éles domain (pl. `https://crm.thecode.hu`) – ez kerül bele az emailekben küldött linkekbe.
+   - `NEXT_PUBLIC_APP_URL` = az éles domain (pl. `https://crm.thecode.hu`) – ez kerül bele az emailekben küldött linkekbe és a Barion redirect/callback URL-jeibe.
+   - `BARION_POS_KEY`, `BARION_PAYEE_EMAIL`, `BARION_ENV` = lásd a "Fizetés (Barion)" szekciót lent – enélkül a "Fizetés" gomb hibaüzenetet ad, a többi funkció változatlanul működik.
 5. **Deploy** – a build parancs (`prisma migrate deploy && prisma generate && next build`, lásd `package.json`) minden deploy-nál automatikusan lefuttatja a függő migrációkat az éles adatbázison.
 6. **Seedelés (opcionális, csak első alkalommal)** – a demó adatok (`npm run db:seed`) kitalált ügyfeleket hoznak létre; éles induláshoz ezt át lehet hagyni, és az admin a "+ Új ügyfél" formmal viszi fel az első valós ügyfeleket. Ha mégis kellenek demó adatok a teszteléshez, a seedet a Supabase connection stringgel helyben kell futtatni (`DATABASE_URL=... DIRECT_URL=... npm run db:seed`), mert a Vercel build nem futtatja automatikusan.
 
@@ -80,6 +87,19 @@ Minden meghívó-email (ügyfélportál csapattag, belső csapattag), jelszó-be
 
 `RESEND_API_KEY` nélkül (pl. helyi fejlesztésnél) minden email-küldés csendben kimarad – a konzolba kiírja, mit küldött volna el, de minden más funkció (fiók létrehozása, meghívás, stb.) ugyanúgy működik.
 
+## Fizetés (Barion)
+
+Az ügyfélportál "Fizetések" oldalán és az admin "Fizetések" oldalán a "Fizetés" / "Fizetési link megnyitása" gomb a [Barion](https://www.barion.com) Smart Gateway-jén keresztül indít valódi bankkártyás fizetést:
+
+1. Regisztrálj egy Barion fiókot (a sandbox teszteléshez a [test.barion.com](https://test.barion.com)-on, valódi cég nélkül is percek alatt), hozz létre egy "Webshop" (POS) kulcsot.
+2. A `BARION_PAYEE_EMAIL` a Barion fiókod regisztrált email címe (ide érkezik a pénz).
+3. Állítsd be a `BARION_POS_KEY`, `BARION_PAYEE_EMAIL` és `BARION_ENV` (`test` vagy `prod`) változókat a Vercel környezeti változói közt.
+4. A Barion fiókodban add meg a callback végpontot is (bár ezt maga a Payment/Start hívás is elküldi minden egyes fizetésnél): `https://<a-domained>/api/barion/callback`.
+
+A fizetés állapotát két helyről is ellenőrizzük (a Barion authoritative API-ján keresztül, sosem a nyers callback body-ból): a Barion callback webhookján (`/api/barion/callback`) és a fizetés utáni redirect-oldalon (`/fizetes/eredmeny`), amelyik előbb fut le.
+
+`BARION_POS_KEY`/`BARION_PAYEE_EMAIL` nélkül a "Fizetés" gomb egy "nincs beállítva" hibaüzenettel tér vissza, minden más funkció (fizetés manuális rögzítése/kézi "Fizetve" jelölés banki átutalásnál, stb.) változatlanul működik.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
@@ -87,7 +107,8 @@ Minden meghívó-email (ügyfélportál csapattag, belső csapattag), jelszó-be
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
 - **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
-- **Csapat, Naptár, Fizetések (Payments + pénzügyi rekonstrukció), Szerződések** – lásd lent a leegyszerűsítéseket
+- **Csapat, Naptár, Szerződések** – lásd lent a leegyszerűsítéseket
+- **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
 - **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
 - **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
@@ -98,7 +119,6 @@ Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session ne
 
 - **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/thecode-xxxxxx`)
 - **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
-- **Fizetési szolgáltató (Stripe/Barion/SimplePay)** – a `Payment` modell és a UI kész, de a "fizetési link" egy generált placeholder URL, nincs mögötte valós fizetési folyamat
 - **PWA telepítés** – nincs `manifest.json` / service worker még
 
 Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás – valóban működik, saját Postgres adatbázisra írva.

@@ -184,7 +184,6 @@ export async function createFullAccountAction(formData: FormData) {
         type: "ONE_TIME",
         status: "CREATED",
         dueDate: contractSignedAt,
-        paymentLink: `https://pay.thecode.hu/${account.id.slice(0, 8)}-${Date.now().toString(36)}`,
       },
     });
   }

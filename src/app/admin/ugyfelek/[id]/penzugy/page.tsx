@@ -4,13 +4,22 @@ import { Card } from "@/components/ui";
 import { formatHUF } from "@/lib/enums";
 import { updateAccountDetailsAction } from "@/lib/actions/account-actions";
 
-export default async function AccountFinancePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AccountFinancePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
+  const { error } = await searchParams;
   const account = await prisma.account.findUnique({ where: { id } });
   if (!account) notFound();
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div>
+      {error ? (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          {error === "barion_not_configured"
+            ? "A bankkártyás fizetés (Barion) nincs beállítva – lásd a README-t a BARION_* env változókról."
+            : "A fizetési link indítása sikertelen volt, próbáld újra."}
+        </div>
+      ) : null}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card>
         <h2 className="mb-3 text-sm font-semibold text-zinc-700">Összesített pénzügyi adatok</h2>
         <form action={updateAccountDetailsAction.bind(null, id)} className="grid grid-cols-2 gap-3 text-sm">
@@ -29,6 +38,7 @@ export default async function AccountFinancePage({ params }: { params: Promise<{
           <Row label="Éves díjbázis (havi × 12)" value={formatHUF(account.monthlyFee * 12)} />
         </dl>
       </Card>
+      </div>
     </div>
   );
 }
