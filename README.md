@@ -127,6 +127,15 @@ Az ügyfélportál telepíthető alkalmazásként (PWA): van `manifest.webmanife
 
 A service worker szándékosan konzervatív: csak a statikus app-shell asseteket (ikonok, offline oldal) cache-eli, minden `/api/` kérést és minden navigálást hálózat-elsőként kezel (csak teljes offline esetén esik vissza a cache-elt `/offline.html`-re) – egy CRM-ben az elavult, cache-elt ügyfél-/fizetési adat félrevezető lenne, ezért API-választ sosem cache-elünk. Nincs hozzá szükséges külső API-kulcs vagy fiók.
 
+## The Code asszisztens
+
+Az ügyfélportál "The Code asszisztens" oldala valódi Claude (Anthropic) API-hívással válaszol az ügyfél saját, élő CRM-adatai alapján (RAG-szerűen: minden kérdés mellé odakerül kontextusként az adott account projektjeinek, leadjeinek, fizetéseinek és jóváhagyásainak aktuális állapota – más account adatát sosem látja a modell).
+
+1. Hozz létre egy API-kulcsot a [console.anthropic.com](https://console.anthropic.com)-on.
+2. Add meg az `ANTHROPIC_API_KEY` változót a Vercel környezeti változói közt.
+
+`ANTHROPIC_API_KEY` nélkül (vagy ha a hívás bármilyen okból sikertelen) az asszisztens egy egyszerű, szabályalapú válaszadóra esik vissza, amely ugyanígy csak a saját account adatait ismeri – a funkció sosem áll le hibával.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
@@ -134,7 +143,8 @@ A service worker szándékosan konzervatív: csak a statikus app-shell asseteket
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
 - **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
-- **Csapat, Szerződések** – lásd lent a leegyszerűsítéseket
+- **Csapat, Szerződések** – csapattag-kezelés valós Google Calendar-csatlakoztatással (lásd fent); a szerződés-munkafolyamat (sablon → kiküldés → aláírás) kézi állapotváltással követett, nincs mögötte valós e-aláírás API (DocuSign-szerű)
+- **The Code asszisztens** – valódi Claude API-hívás az ügyfél saját CRM-adatain, szabályalapú fallback-kel (lásd lent)
 - **Naptár** – közös csapat-naptár, csapattagonkénti Google Calendar OAuth-csatlakoztatás, valódi Meet-link generálás csatlakoztatott csapattagoknál (lásd lent)
 - **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
 - **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
@@ -142,13 +152,13 @@ A service worker szándékosan konzervatív: csak a statikus app-shell asseteket
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
 - **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
 
-## Tudatosan egyszerűsített / stub részek
+## Tudatosan egyszerűsített rész
 
-Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session nem rendelkezik:
+Ehhez valós, díjköteles 3rd-party API kellene, amivel ez a session nem rendelkezik:
 
-- **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
+- **Szerződések e-aláírása** – a `Contract` modell és a UI (sablon → kiküldés → aláírás) kész, de az állapotváltás kézi, nincs mögötte valós e-aláírás szolgáltató (pl. DocuSign) integráció
 
-Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás – valóban működik, saját Postgres adatbázisra írva.
+Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás, az email küldés, a fizetés, a Google Calendar szinkron, a PWA telepítés és a The Code asszisztens – valóban működik, saját Postgres adatbázisra írva.
 
 ## Adatmodell
 

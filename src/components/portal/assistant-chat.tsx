@@ -16,10 +16,11 @@ export function AssistantChat() {
 
   function ask(question: string) {
     if (!question.trim()) return;
+    const priorHistory = messages.slice(1); // az üdvözlő üzenet nélkül
     setMessages((m) => [...m, { role: "user", text: question }]);
     setInput("");
     startTransition(async () => {
-      const answer = await askAssistantAction(question);
+      const answer = await askAssistantAction(question, priorHistory);
       setMessages((m) => [...m, { role: "assistant", text: answer }]);
     });
   }
