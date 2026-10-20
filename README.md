@@ -36,6 +36,11 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 BARION_POS_KEY=""
 BARION_PAYEE_EMAIL=""
 BARION_ENV="test"
+
+# Google Calendar szinkronhoz (valódi Meet-link generálás) - opcionális helyben:
+# GOOGLE_CLIENT_ID/SECRET nélkül a "Csatlakoztatás" gomb egy hibaüzenettel tér vissza, minden más működik.
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
 ```
 
 ```bash
@@ -74,6 +79,7 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
    - `EMAIL_FROM` = pl. `"The Code <onboarding@resend.dev>"` verifikált domain nélkül, vagy `"The Code <hello@thecode.hu>"` ha a domain már verifikálva van a Resende-ben.
    - `NEXT_PUBLIC_APP_URL` = az éles domain (pl. `https://crm.thecode.hu`) – ez kerül bele az emailekben küldött linkekbe és a Barion redirect/callback URL-jeibe.
    - `BARION_POS_KEY`, `BARION_PAYEE_EMAIL`, `BARION_ENV` = lásd a "Fizetés (Barion)" szekciót lent – enélkül a "Fizetés" gomb hibaüzenetet ad, a többi funkció változatlanul működik.
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` = lásd a "Google Calendar szinkron" szekciót lent – enélkül a "Csatlakoztatás" gomb hibaüzenetet ad, a többi funkció változatlanul működik.
 5. **Deploy** – a build parancs (`prisma migrate deploy && prisma generate && next build`, lásd `package.json`) minden deploy-nál automatikusan lefuttatja a függő migrációkat az éles adatbázison.
 6. **Seedelés (opcionális, csak első alkalommal)** – a demó adatok (`npm run db:seed`) kitalált ügyfeleket hoznak létre; éles induláshoz ezt át lehet hagyni, és az admin a "+ Új ügyfél" formmal viszi fel az első valós ügyfeleket. Ha mégis kellenek demó adatok a teszteléshez, a seedet a Supabase connection stringgel helyben kell futtatni (`DATABASE_URL=... DIRECT_URL=... npm run db:seed`), mert a Vercel build nem futtatja automatikusan.
 
@@ -100,6 +106,17 @@ A fizetés állapotát két helyről is ellenőrizzük (a Barion authoritative A
 
 `BARION_POS_KEY`/`BARION_PAYEE_EMAIL` nélkül a "Fizetés" gomb egy "nincs beállítva" hibaüzenettel tér vissza, minden más funkció (fizetés manuális rögzítése/kézi "Fizetve" jelölés banki átutalásnál, stb.) változatlanul működik.
 
+## Google Calendar szinkron
+
+A "Csapat" oldalon minden csapattag saját Google Calendar-ját csatlakoztathatja; ha csatlakoztatva van, az admin "Naptár" oldalán létrehozott foglalásai valódi Google Calendar eseményként jönnek létre, automatikusan generált Google Meet linkkel (nem egy kitalált URL).
+
+1. Hozz létre egy projektet a [Google Cloud Console](https://console.cloud.google.com)-ban, engedélyezd a "Google Calendar API"-t.
+2. "APIs & Services → OAuth consent screen": állítsd be "External" típusra (vagy "Internal", ha Google Workspace szervezeted van); amíg nincs Google-verifikáció, csak a "Test users" listára felvett Google-fiókok tudnak csatlakozni – vedd fel ide a csapattagok Gmail-címeit.
+3. "APIs & Services → Credentials → Create Credentials → OAuth client ID", típus: "Web application". Az "Authorized redirect URIs" alá vedd fel pontosan: `https://<éles-domain>/api/google-calendar/callback` (helyi teszteléshez: `http://localhost:3000/api/google-calendar/callback`).
+4. A létrejött Client ID/Secret kerül a `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` env változókba.
+
+A csatlakoztatás egy valódi Google OAuth consent-tel történik (a "Csatlakoztatás" gombra kattintva az adott csapattag a saját Google-fiókjával jelentkezik be és ad hozzáférést) – nem az admin "csatlakoztatja" más nevében. `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` nélkül a "Csatlakoztatás" gomb egy hibaüzenettel tér vissza, a foglalások ettől még ugyanúgy létrehozhatók, csak Meet-link nélkül.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
@@ -107,7 +124,8 @@ A fizetés állapotát két helyről is ellenőrizzük (a Barion authoritative A
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
 - **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
-- **Csapat, Naptár, Szerződések** – lásd lent a leegyszerűsítéseket
+- **Csapat, Szerződések** – lásd lent a leegyszerűsítéseket
+- **Naptár** – közös csapat-naptár, csapattagonkénti Google Calendar OAuth-csatlakoztatás, valódi Meet-link generálás csatlakoztatott csapattagoknál (lásd lent)
 - **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
 - **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
@@ -117,7 +135,6 @@ A fizetés állapotát két helyről is ellenőrizzük (a Barion authoritative A
 
 Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session nem rendelkezik:
 
-- **Google Calendar szinkron** – a naptár modul figyelmezet, ha egy csapattagnak nincs kötve Google-fiókja, de a valós OAuth + Meet-link generálás mock (`meet.google.com/thecode-xxxxxx`)
 - **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
 - **PWA telepítés** – nincs `manifest.json` / service worker még
 

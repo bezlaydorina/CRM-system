@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireStaffSession } from "@/lib/auth";
+import { createGoogleCalendarEvent } from "@/lib/google-calendar";
 
 export async function createCalendarEventAction(formData: FormData) {
   const session = await requireStaffSession();
@@ -15,6 +16,8 @@ export async function createCalendarEventAction(formData: FormData) {
   const teamMemberId = String(formData.get("teamMemberId") ?? "") || session.teamMemberId;
   const teamMember = await prisma.teamMember.findUnique({ where: { id: teamMemberId } });
 
+  const googleEvent = teamMember?.googleCalendarConnected ? await createGoogleCalendarEvent({ teamMember, title, startAt, endAt }) : null;
+
   await prisma.calendarEvent.create({
     data: {
       organizationId: session.organizationId,
@@ -24,7 +27,8 @@ export async function createCalendarEventAction(formData: FormData) {
       title,
       startAt,
       endAt,
-      meetLink: teamMember?.googleCalendarConnected ? `https://meet.google.com/thecode-${Math.random().toString(36).slice(2, 8)}` : null,
+      meetLink: googleEvent?.meetLink ?? null,
+      googleEventId: googleEvent?.googleEventId ?? null,
     },
   });
   revalidatePath("/admin/naptar");

@@ -39,6 +39,9 @@ model TeamMember {
   jobRole                 String // Admin, CSM, Closer, Setter, Fejlesztő, Értékesítő
   systemRole              String       @default("STAFF") // ADMIN | STAFF
   googleCalendarConnected Boolean      @default(false)
+  googleRefreshToken      String? // OAuth refresh token - csak szerveroldalon olvasva
+  googleAccessToken       String?
+  googleTokenExpiresAt    DateTime?
   createdAt               DateTime     @default(now())
 
   assignments      TeamAssignment[]
@@ -425,6 +428,7 @@ model CalendarEvent {
   startAt        DateTime
   endAt          DateTime
   meetLink       String?
+  googleEventId  String? // a Google Calendar eseményének azonosítója, ha szinkronizálva lett
   createdAt      DateTime     @default(now())
 }
 

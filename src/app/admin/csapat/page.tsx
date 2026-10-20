@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { PageHeader, Card, Avatar } from "@/components/ui";
+import { PageHeader, Card, Avatar, Badge } from "@/components/ui";
 import { TEAM_ROLES } from "@/lib/enums";
 import { createTeamMemberAction } from "@/lib/actions/team-actions";
+import { connectGoogleCalendarAction, disconnectGoogleCalendarAction } from "@/lib/actions/google-calendar-actions";
 
-export default async function TeamPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q = "" } = await searchParams;
+export default async function TeamPage({ searchParams }: { searchParams: Promise<{ q?: string; error?: string; connected?: string }> }) {
+  const { q = "", error, connected } = await searchParams;
   const members = await prisma.teamMember.findMany({
     where: q
       ? { OR: [{ name: { contains: q } }, { jobRole: { contains: q } }] }
@@ -15,6 +16,17 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
   return (
     <div>
       <PageHeader title="Csapat" subtitle={`${members.length} csapattag`} />
+
+      {connected ? (
+        <div className="mb-4 rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700">Google Calendar sikeresen csatlakoztatva.</div>
+      ) : null}
+      {error ? (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          {error === "google_not_configured"
+            ? "A Google Calendar integráció nincs beállítva – lásd a README-t a GOOGLE_* env változókról."
+            : "A Google Calendar csatlakoztatása sikertelen volt, próbáld újra."}
+        </div>
+      ) : null}
 
       <form className="mb-4">
         <input
@@ -35,6 +47,20 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
             <p className="text-xs text-brand-gold">{m.jobRole}</p>
             <p className="mt-1 text-[11px] text-zinc-400">{m.email}</p>
             <p className="text-[11px] text-zinc-400">{m.phone ?? "—"}</p>
+            <div className="mt-2 border-t border-zinc-100 pt-2">
+              {m.googleCalendarConnected ? (
+                <div className="flex items-center justify-center gap-1.5">
+                  <Badge color="green">Calendar csatlakoztatva</Badge>
+                  <form action={disconnectGoogleCalendarAction.bind(null, m.id)}>
+                    <button className="text-[11px] text-red-600 hover:underline">Leválasztás</button>
+                  </form>
+                </div>
+              ) : (
+                <form action={connectGoogleCalendarAction.bind(null, m.id)}>
+                  <button className="text-[11px] font-medium text-brand-gold hover:underline">Google Calendar csatlakoztatása</button>
+                </form>
+              )}
+            </div>
           </Card>
         ))}
 
