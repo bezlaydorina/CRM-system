@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId, getSession } from "@/lib/auth";
 import { PageHeader, Card, Badge } from "@/components/ui";
+import { InstallAppCard } from "@/components/install-app-card";
 import {
   updateOwnProfileAction,
   invitePortalTeammateAction,
@@ -90,10 +91,7 @@ export default async function PortalSettingsPage() {
 
         <Card>
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Telepítsd appként</h2>
-          <p className="text-sm text-zinc-500">
-            Az ügyfélportál Progressive Web App (PWA) telepítést ebben az MVP-ben a manifest/service worker
-            hiányában még nem támogatja – ez a következő fejlesztési kör (12.2/7. fázis) része.
-          </p>
+          <InstallAppCard />
         </Card>
       </div>
     </div>

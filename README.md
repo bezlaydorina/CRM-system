@@ -117,6 +117,16 @@ A "Csapat" oldalon minden csapattag saját Google Calendar-ját csatlakoztathatj
 
 A csatlakoztatás egy valódi Google OAuth consent-tel történik (a "Csatlakoztatás" gombra kattintva az adott csapattag a saját Google-fiókjával jelentkezik be és ad hozzáférést) – nem az admin "csatlakoztatja" más nevében. `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` nélkül a "Csatlakoztatás" gomb egy hibaüzenettel tér vissza, a foglalások ettől még ugyanúgy létrehozhatók, csak Meet-link nélkül.
 
+## PWA telepítés
+
+Az ügyfélportál telepíthető alkalmazásként (PWA): van `manifest.webmanifest` (`src/app/manifest.ts`), app ikonok (`public/icons/`), és egy service worker (`public/sw.js`), amit a gyökér layout regisztrál.
+
+- Chrome/Edge/Android-on a "Beállítások" oldal "Telepítsd appként" kártyája a böngésző natív telepítési promptját (`beforeinstallprompt`) ajánlja fel egy gombbal.
+- iOS Safarin (ahol nincs programozott telepítési API) a kártya lépésenkénti instrukciót ad a "Kezdőképernyőhöz adás" funkcióhoz.
+- Ha az app már telepítve van (`display-mode: standalone`), a kártya ezt jelzi.
+
+A service worker szándékosan konzervatív: csak a statikus app-shell asseteket (ikonok, offline oldal) cache-eli, minden `/api/` kérést és minden navigálást hálózat-elsőként kezel (csak teljes offline esetén esik vissza a cache-elt `/offline.html`-re) – egy CRM-ben az elavult, cache-elt ügyfél-/fizetési adat félrevezető lenne, ezért API-választ sosem cache-elünk. Nincs hozzá szükséges külső API-kulcs vagy fiók.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
@@ -128,6 +138,7 @@ A csatlakoztatás egy valódi Google OAuth consent-tel történik (a "Csatlakozt
 - **Naptár** – közös csapat-naptár, csapattagonkénti Google Calendar OAuth-csatlakoztatás, valódi Meet-link generálás csatlakoztatott csapattagoknál (lásd lent)
 - **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
 - **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
+- **PWA telepítés** – manifest, service worker, app ikonok, valódi "Telepítsd appként" gomb (lásd lent)
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
 - **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
 
@@ -136,7 +147,6 @@ A csatlakoztatás egy valódi Google OAuth consent-tel történik (a "Csatlakozt
 Ezekhez valós, díjköteles 3rd-party API-kulcs kellene, amivel ez a session nem rendelkezik:
 
 - **The Code asszisztens** – egyszerű, szabályalapú válaszadó a saját account adatain (nem hív külső LLM API-t)
-- **PWA telepítés** – nincs `manifest.json` / service worker még
 
 Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás – valóban működik, saját Postgres adatbázisra írva.
 

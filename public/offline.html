@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nincs internetkapcsolat — The Code CRM</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #f7f2ea;
+        color: #30252a;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .wrap {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 420px;
+        text-align: center;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 40px 32px;
+        box-shadow: 0 10px 30px rgba(74, 16, 42, 0.12);
+      }
+      .badge {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: #4a102a;
+        color: #b89a62;
+        font-weight: 700;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 8px;
+        color: #4a102a;
+      }
+      p {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #30252a;
+        opacity: 0.8;
+        margin: 0 0 24px;
+      }
+      button {
+        background: #4a102a;
+        color: #f7f2ea;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #30081c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="badge">T</div>
+        <h1>Nincs internetkapcsolat</h1>
+        <p>
+          Jelenleg nem érhető el a The Code CRM. Kérjük, ellenőrizd a hálózati
+          kapcsolatot, majd próbáld újra.
+        </p>
+        <button onclick="location.reload()">Újratöltés</button>
+      </div>
+    </div>
+  </body>
+</html>
