@@ -136,6 +136,18 @@ Az ügyfélportál "The Code asszisztens" oldala valódi Claude (Anthropic) API-
 
 `ANTHROPIC_API_KEY` nélkül (vagy ha a hívás bármilyen okból sikertelen) az asszisztens egy egyszerű, szabályalapú válaszadóra esik vissza, amely ugyanígy csak a saját account adatait ismeri – a funkció sosem áll le hibával.
 
+## Szerződések e-aláírása (Dropbox Sign)
+
+Az admin "Szerződések" oldalon a "Küldés e-aláírásra" gomb a szerződés adataiból (ügyfél neve, sablon, összeg) valódi, Magyar nyelvű PDF-et generál (PDF-lib + beágyazott DejaVu Sans font – a magyar ő/ű karakterek miatt a beépített PDF-alapfontok nem jók), majd elküldi az ügyfél elsődleges kapcsolattartójának aláírásra a [Dropbox Sign](https://sign.dropbox.com) API-n keresztül.
+
+1. Regisztrálj egy Dropbox Sign fiókot, és az API beállításoknál hozz létre egy API-kulcsot.
+2. Add meg a `DROPBOX_SIGN_API_KEY` változót a Vercel környezeti változói közt. Alapértelmezetten teszt-módban megy minden kérés (`DROPBOX_SIGN_TEST_MODE="true"`), ami nem jogilag kötelező érvényű – élesben állítsd `"false"`-ra.
+3. A Dropbox Sign API App beállításainál állítsd be a callback (webhook) URL-t: `https://<a-domained>/api/dropbox-sign/callback`.
+
+Innentől az állapotot (Elküldve → Megtekintve → Aláírva/Elutasítva) a Dropbox Sign webhookja automatikusan frissíti – sosem a nyers webhook body-ból, hanem mindig a Dropbox Sign API-tól a saját API-kulcsunkkal frissen visszakérdezve (ugyanaz az elv, mint a Barion fizetési callback-nél), és a webhook hitelességét HMAC-SHA256 event-hash ellenőrzéssel validáljuk. Aláírás után az aláírt végleges PDF-et is letöltjük és eltároljuk.
+
+`DROPBOX_SIGN_API_KEY` nélkül a "Küldés e-aláírásra" gomb egy hibaüzenettel tér vissza; a korábbi kézi állapotkövetés (Elküldés/Megtekintve/Aláírva gombok) a még nem e-aláírásra küldött szerződéseknél (pl. papíron aláírt szerződéseknél) változatlanul elérhető marad.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
@@ -143,7 +155,8 @@ Az ügyfélportál "The Code asszisztens" oldala valódi Claude (Anthropic) API-
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
 - **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
-- **Csapat, Szerződések** – csapattag-kezelés valós Google Calendar-csatlakoztatással (lásd fent); a szerződés-munkafolyamat (sablon → kiküldés → aláírás) kézi állapotváltással követett, nincs mögötte valós e-aláírás API (DocuSign-szerű)
+- **Csapat** – csapattag-kezelés valós Google Calendar-csatlakoztatással (lásd fent)
+- **Szerződések** – valódi PDF-generálás + e-aláírás Dropbox Sign-on keresztül, automatikus állapotkövetéssel (lásd lent)
 - **The Code asszisztens** – valódi Claude API-hívás az ügyfél saját CRM-adatain, szabályalapú fallback-kel (lásd lent)
 - **Naptár** – közös csapat-naptár, csapattagonkénti Google Calendar OAuth-csatlakoztatás, valódi Meet-link generálás csatlakoztatott csapattagoknál (lásd lent)
 - **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
@@ -152,13 +165,9 @@ Az ügyfélportál "The Code asszisztens" oldala valódi Claude (Anthropic) API-
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
 - **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
 
-## Tudatosan egyszerűsített rész
+## Nincs már stub rész
 
-Ehhez valós, díjköteles 3rd-party API kellene, amivel ez a session nem rendelkezik:
-
-- **Szerződések e-aláírása** – a `Contract` modell és a UI (sablon → kiküldés → aláírás) kész, de az állapotváltás kézi, nincs mögötte valós e-aláírás szolgáltató (pl. DocuSign) integráció
-
-Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás, az email küldés, a fizetés, a Google Calendar szinkron, a PWA telepítés és a The Code asszisztens – valóban működik, saját Postgres adatbázisra írva.
+Minden funkció valódi, külső szolgáltatásra épülő integrációval működik (saját API-kulcs nélkül mindegyik graceful fallback-kel, sosem hibával leáll): account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás, az email küldés (Resend), a fizetés (Barion), a Google Calendar szinkron, a PWA telepítés, a The Code asszisztens (Claude API) és a szerződések e-aláírása (Dropbox Sign) – mind saját Postgres adatbázisra írva.
 
 ## Adatmodell
 

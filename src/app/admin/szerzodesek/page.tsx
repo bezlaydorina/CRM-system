@@ -3,7 +3,8 @@ import { PageHeader, Card } from "@/components/ui";
 import { ContractsTable } from "@/components/finance/contracts-table";
 import { createContractAction } from "@/lib/actions/finance-actions";
 
-export default async function ContractsPage() {
+export default async function ContractsPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
   const [contracts, accounts] = await Promise.all([
     prisma.contract.findMany({ where: { account: { isInternalSales: false } }, include: { account: true }, orderBy: { createdAt: "desc" } }),
     prisma.account.findMany({ where: { isInternalSales: false }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
@@ -12,6 +13,15 @@ export default async function ContractsPage() {
   return (
     <div>
       <PageHeader title="Szerződések" subtitle="E-aláírás követés – sablon, kiküldés, aláírás" />
+      {error ? (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          {error === "dropbox_sign_not_configured"
+            ? "Az e-aláírás (Dropbox Sign) nincs beállítva – lásd a README-t a DROPBOX_SIGN_API_KEY env változóról."
+            : error === "dropbox_sign_no_signer"
+              ? "Az ügyfélnek nincs elsődleges kapcsolattartója email címmel – add meg előbb az Ügyfelek oldalon."
+              : "Az e-aláírásra küldés sikertelen volt, próbáld újra."}
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         <div className="lg:col-span-3">
           <ContractsTable contracts={contracts} />

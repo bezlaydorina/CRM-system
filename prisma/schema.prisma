@@ -349,15 +349,16 @@ model Payment {
 }
 
 model Contract {
-  id           String    @id @default(cuid())
-  accountId    String
-  account      Account   @relation(fields: [accountId], references: [id])
-  status       String    @default("DRAFT") // DRAFT|SENT|VIEWED|SIGNED
-  amount       Float
-  templateName String    @default("Alap szolgáltatási szerződés")
-  documentUrl  String?
-  createdAt    DateTime  @default(now())
-  signedAt     DateTime?
+  id                   String    @id @default(cuid())
+  accountId            String
+  account              Account   @relation(fields: [accountId], references: [id])
+  status               String    @default("DRAFT") // DRAFT|SENT|VIEWED|SIGNED|DECLINED
+  amount               Float
+  templateName         String    @default("Alap szolgáltatási szerződés")
+  documentUrl          String? // a generált (majd aláírás után a véglegesen aláírt) PDF elérési útja
+  dropboxSignRequestId String? // Dropbox Sign signature_request_id - ha be van állítva, az állapotot a webhook vezérli
+  createdAt            DateTime  @default(now())
+  signedAt             DateTime?
 }
 
 model Report {

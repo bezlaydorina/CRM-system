@@ -166,6 +166,7 @@ export const CONTRACT_STATUSES = [
   { key: "SENT", label: "Elküldve" },
   { key: "VIEWED", label: "Megtekintve" },
   { key: "SIGNED", label: "Aláírva" },
+  { key: "DECLINED", label: "Elutasítva" },
 ] as const;
 
 export function formatHUF(amount: number) {
