@@ -7,6 +7,9 @@ import { requireStaffSession } from "@/lib/auth";
 import { hashPassword } from "@/lib/password";
 import { createDefaultCrmSetup } from "@/lib/tenant-setup";
 import { ACCOUNT_LIFECYCLE_STAGES, ACCOUNT_PACKAGES } from "@/lib/enums";
+import { sendEmail, getAppUrl } from "@/lib/email";
+import { portalInviteEmail, portalReadyEmail } from "@/lib/email-templates";
+import { createPortalSetupToken } from "@/lib/auth-tokens";
 
 export async function moveAccountStage(accountId: string, newStage: string) {
   await requireStaffSession();
@@ -43,6 +46,24 @@ function buildPrimaryContactData(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const fullName = [lastName, firstName].filter(Boolean).join(" ").trim();
   return { firstName, lastName, email, fullName };
+}
+
+async function sendPortalWelcomeEmail(contact: { id: string; fullName: string; email: string | null }, accountName: string, alreadyHasPassword: boolean) {
+  if (!contact.email) return;
+  if (alreadyHasPassword) {
+    await sendEmail({
+      to: contact.email,
+      subject: `Elkészült a(z) ${accountName} ügyfélportálja`,
+      html: portalReadyEmail({ contactName: contact.fullName, accountName, loginUrl: `${getAppUrl()}/portal/login` }),
+    });
+  } else {
+    const setupUrl = await createPortalSetupToken(contact.id);
+    await sendEmail({
+      to: contact.email,
+      subject: `Meghívó – ${accountName} ügyfélportál`,
+      html: portalInviteEmail({ contactName: contact.fullName, accountName, setupUrl }),
+    });
+  }
 }
 
 async function createOnboardingTask(session: { organizationId: string; teamMemberId: string }, accountId: string, accountName: string, description: string) {
@@ -82,7 +103,7 @@ export async function quickSaveAccountAction(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;
 
-  await prisma.contact.create({
+  const contact = await prisma.contact.create({
     data: {
       accountId: account.id,
       fullName: fullName || name,
@@ -94,6 +115,7 @@ export async function quickSaveAccountAction(formData: FormData) {
     },
   });
 
+  await sendPortalWelcomeEmail(contact, account.name, setPassword);
   await createOnboardingTask(session, account.id, account.name, "Gyorsmentésből jött – vedd fel a kapcsolatot, és pótold a csomagot/pénzügyi adatokat.");
 
   await prisma.activityLogEntry.create({
@@ -137,7 +159,7 @@ export async function createFullAccountAction(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;
 
-  await prisma.contact.create({
+  const contact = await prisma.contact.create({
     data: {
       accountId: account.id,
       fullName,
@@ -148,6 +170,8 @@ export async function createFullAccountAction(formData: FormData) {
       passwordHash: setPassword ? await hashPassword(password) : null,
     },
   });
+
+  await sendPortalWelcomeEmail(contact, account.name, setPassword);
 
   if (contractSignedAt) {
     await prisma.contract.create({

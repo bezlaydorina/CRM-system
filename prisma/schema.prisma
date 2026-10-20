@@ -34,7 +34,7 @@ model TeamMember {
   name                    String
   email                   String       @unique
   phone                   String?
-  passwordHash            String
+  passwordHash            String? // null amíg az invite emailből be nem állítja a sajátját
   avatarColor             String       @default("#6366f1")
   jobRole                 String // Admin, CSM, Closer, Setter, Fejlesztő, Értékesítő
   systemRole              String       @default("STAFF") // ADMIN | STAFF
@@ -49,6 +49,7 @@ model TeamMember {
   calendarEvents   CalendarEvent[]
   messages         Message[]          @relation("StaffMessages")
   projectsAssigned Project[]
+  authTokens       AuthToken[]
 }
 
 // ---------------------------------------------------------------------------
@@ -118,6 +119,24 @@ model Contact {
 
   calendarEvents CalendarEvent[]
   messages       Message[]       @relation("ClientMessages")
+  authTokens     AuthToken[]
+}
+
+// ---------------------------------------------------------------------------
+// Email-alapú jelszó-beállítás / meghívó linkek
+// ---------------------------------------------------------------------------
+
+model AuthToken {
+  id           String      @id @default(cuid())
+  token        String      @unique @default(cuid())
+  purpose      String // PORTAL_SET_PASSWORD | STAFF_SET_PASSWORD
+  contactId    String?
+  contact      Contact?    @relation(fields: [contactId], references: [id])
+  teamMemberId String?
+  teamMember   TeamMember? @relation(fields: [teamMemberId], references: [id])
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime    @default(now())
 }
 
 model TeamAssignment {
@@ -338,14 +357,15 @@ model Contract {
 }
 
 model Report {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
-  period      String   @default("WEEK") // WEEK|MONTH
-  generatedAt DateTime @default(now())
-  isAutomatic Boolean  @default(true)
-  metrics     String   @default("{}") // JSON: spend, conversions, roas, impressions, clicks
-  shareToken  String   @unique @default(cuid())
+  account     Account   @relation(fields: [accountId], references: [id])
+  period      String    @default("WEEK") // WEEK|MONTH
+  generatedAt DateTime  @default(now())
+  isAutomatic Boolean   @default(true)
+  metrics     String    @default("{}") // JSON: activeProjects, completedProjects, totalBudget, nextDeadline
+  shareToken  String    @unique @default(cuid())
+  emailSentAt DateTime?
 }
 
 // ---------------------------------------------------------------------------

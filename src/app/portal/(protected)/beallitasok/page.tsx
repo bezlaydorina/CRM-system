@@ -11,7 +11,13 @@ export default async function PortalSettingsPage() {
   const accountId = (await getEffectiveAccountId())!;
   const session = await getSession();
   const [contacts, me] = await Promise.all([
-    prisma.contact.findMany({ where: { accountId, canLoginPortal: true }, orderBy: { isPrimary: "desc" } }),
+    prisma.contact.findMany({
+      where: {
+        accountId,
+        OR: [{ isPrimary: true }, { canLoginPortal: true }, { authTokens: { some: { purpose: "PORTAL_SET_PASSWORD", usedAt: null } } }],
+      },
+      orderBy: { isPrimary: "desc" },
+    }),
     session?.kind === "client" ? prisma.contact.findUnique({ where: { id: session.contactId } }) : null,
   ]);
 
@@ -52,7 +58,11 @@ export default async function PortalSettingsPage() {
                   {c.fullName} <span className="text-xs text-zinc-400">· {c.email}</span>
                 </span>
                 <div className="flex items-center gap-2">
-                  <Badge color={c.accessLevel === "FULL" ? "green" : "gray"}>{c.accessLevel === "FULL" ? "Teljes hozzáférés" : "Korlátozott"}</Badge>
+                  {c.canLoginPortal ? (
+                    <Badge color={c.accessLevel === "FULL" ? "green" : "gray"}>{c.accessLevel === "FULL" ? "Teljes hozzáférés" : "Korlátozott"}</Badge>
+                  ) : (
+                    <Badge color="amber">Meghívás elküldve</Badge>
+                  )}
                   {!c.isPrimary ? (
                     <form action={removePortalTeammateAction.bind(null, c.id)}>
                       <button className="text-xs text-red-600 hover:underline">Törlés</button>

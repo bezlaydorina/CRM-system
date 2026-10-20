@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hashPassword } from "@/lib/password";
+import { sendEmail } from "@/lib/email";
+import { portalInviteEmail } from "@/lib/email-templates";
+import { createPortalSetupToken } from "@/lib/auth-tokens";
 
 export async function updateOwnProfileAction(formData: FormData) {
   const session = await getSession();
@@ -25,16 +27,24 @@ export async function invitePortalTeammateAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!fullName || !email) return;
 
-  await prisma.contact.create({
+  const account = await prisma.account.findUnique({ where: { id: session.accountId } });
+  const contact = await prisma.contact.create({
     data: {
       accountId: session.accountId,
       fullName,
       email,
-      canLoginPortal: true,
+      canLoginPortal: false,
       accessLevel: String(formData.get("accessLevel") ?? "LIMITED"),
-      passwordHash: await hashPassword("ugyfel123"),
     },
   });
+
+  const setupUrl = await createPortalSetupToken(contact.id);
+  await sendEmail({
+    to: email,
+    subject: `Meghívó – ${account?.name ?? "The Code"} ügyfélportál`,
+    html: portalInviteEmail({ contactName: fullName, accountName: account?.name ?? "The Code", setupUrl }),
+  });
+
   revalidatePath("/portal/beallitasok");
 }
 

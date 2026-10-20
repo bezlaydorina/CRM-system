@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
 import { PageHeader, Card, Badge, EmptyState } from "@/components/ui";
 import { formatHUF } from "@/lib/enums";
-import { generateManualReportAction } from "@/lib/actions/report-actions";
+import { generateManualReportAction, emailReportAction } from "@/lib/actions/report-actions";
 
 export default async function PortalReportsPage() {
   const accountId = (await getEffectiveAccountId())!;
@@ -45,7 +45,15 @@ export default async function PortalReportsPage() {
                 <a href={`/report/${r.shareToken}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-brand-gold hover:underline">
                   Megnyitás
                 </a>
-                <span className="text-xs text-zinc-400">Email</span>
+                {r.emailSentAt ? (
+                  <span className="text-xs text-zinc-400" title={r.emailSentAt.toLocaleString("hu-HU")}>
+                    Elküldve
+                  </span>
+                ) : (
+                  <form action={emailReportAction.bind(null, r.id)}>
+                    <button className="text-xs font-medium text-brand-gold hover:underline">Email</button>
+                  </form>
+                )}
               </div>
             </div>
           );

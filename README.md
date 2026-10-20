@@ -24,6 +24,12 @@ Majd `.env`-ben állítsd be (lásd `.env.example`):
 DATABASE_URL="postgresql://postgres:<jelszó>@localhost:5432/crm_dev"
 DIRECT_URL="postgresql://postgres:<jelszó>@localhost:5432/crm_dev"
 SESSION_SECRET="<bármilyen hosszú random string>"
+
+# Email küldéshez (meghívók, jelszó-beállító linkek, riport-email) - opcionális helyben:
+# RESEND_API_KEY nélkül minden email csak a konzolra íródik ki, nem küld semmit.
+RESEND_API_KEY=""
+EMAIL_FROM="The Code <onboarding@resend.dev>"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 ```bash
@@ -58,12 +64,25 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
    - `DATABASE_URL` = a pooler connection string
    - `DIRECT_URL` = a direct connection string
    - `SESSION_SECRET` = egy hosszú random string (pl. `openssl rand -base64 32`)
+   - `RESEND_API_KEY` = lásd az "Email küldés" szekciót lent – enélkül minden email (meghívók, jelszó-linkek, riport-email) kihagyásra kerül, a többi funkció változatlanul működik.
+   - `EMAIL_FROM` = pl. `"The Code <onboarding@resend.dev>"` verifikált domain nélkül, vagy `"The Code <hello@thecode.hu>"` ha a domain már verifikálva van a Resende-ben.
+   - `NEXT_PUBLIC_APP_URL` = az éles domain (pl. `https://crm.thecode.hu`) – ez kerül bele az emailekben küldött linkekbe.
 5. **Deploy** – a build parancs (`prisma migrate deploy && prisma generate && next build`, lásd `package.json`) minden deploy-nál automatikusan lefuttatja a függő migrációkat az éles adatbázison.
 6. **Seedelés (opcionális, csak első alkalommal)** – a demó adatok (`npm run db:seed`) kitalált ügyfeleket hoznak létre; éles induláshoz ezt át lehet hagyni, és az admin a "+ Új ügyfél" formmal viszi fel az első valós ügyfeleket. Ha mégis kellenek demó adatok a teszteléshez, a seedet a Supabase connection stringgel helyben kell futtatni (`DATABASE_URL=... DIRECT_URL=... npm run db:seed`), mert a Vercel build nem futtatja automatikusan.
 
+## Email küldés (Resend)
+
+Minden meghívó-email (ügyfélportál csapattag, belső csapattag), jelszó-beállító link és a riport "Email" gomb a [Resend](https://resend.com)-en keresztül megy:
+
+1. Regisztrálj a [resend.com](https://resend.com)-on, hozz létre egy API kulcsot.
+2. Domain verifikáció nélkül azonnal tudsz küldeni egy `onboarding@resend.dev` tesztcímről (max. a saját, Resende-hez regisztrált email címedre) – ez jó teszteléshez, de élesben a sajátdomaines feladó (pl. `hello@thecode.hu`) ajánlott, amihez pár DNS rekordot (SPF/DKIM) kell felvenni a Resend "Domains" fülén.
+3. Állítsd be a `RESEND_API_KEY`-t (és opcionálisan `EMAIL_FROM`-ot) a Vercel környezeti változói közt.
+
+`RESEND_API_KEY` nélkül (pl. helyi fejlesztésnél) minden email-küldés csendben kimarad – a konzolba kiírja, mit küldött volna el, de minden más funkció (fiók létrehozása, meghívás, stb.) ugyanúgy működik.
+
 ## Megvalósított modulok
 
-- **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen
+- **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
 - **Ügyfelek** – Lista + 12 szakaszos életciklus Kanban (drag&drop), 5 fülös adatlap (Áttekintés / CRM és leadek / Adatok és űrlapok / Projektek és szolgáltatások / Pénzügy), CSV export, jelszó módosítás, archiválás, törlés
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
@@ -86,4 +105,4 @@ Minden más – account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóv
 
 ## Adatmodell
 
-Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, Credential) a specifikáció 3. fejezete alapján.
+Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, Credential, AuthToken) a specifikáció 3. fejezete alapján.
