@@ -6,6 +6,7 @@ import { addCredentialAction, updateAccountDetailsAction } from "@/lib/actions/a
 import { saveIntakeResponseAction } from "@/lib/actions/intake-actions";
 import { DynamicFieldInput } from "@/components/dynamic-field-input";
 import { getCurrentTeamMember } from "@/lib/auth";
+import { decryptSecret } from "@/lib/crypto";
 
 export default async function AccountDataPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -65,7 +66,7 @@ export default async function AccountDataPage({ params }: { params: Promise<{ id
               account.credentials.map((c) => (
                 <div key={c.id} className="rounded-lg border border-zinc-100 px-3 py-2">
                   <p className="text-xs font-semibold text-zinc-600">{c.label}</p>
-                  <p className="font-mono text-sm text-zinc-800">{c.value}</p>
+                  <p className="font-mono text-sm text-zinc-800">{decryptSecret(c.value)}</p>
                 </div>
               ))
             )}

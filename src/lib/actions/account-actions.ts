@@ -11,6 +11,7 @@ import { sendEmail, getAppUrl } from "@/lib/email";
 import { portalInviteEmail, portalReadyEmail } from "@/lib/email-templates";
 import { createPortalSetupToken } from "@/lib/auth-tokens";
 import { linkReferralIfValid } from "@/lib/referrals";
+import { encryptSecret } from "@/lib/crypto";
 
 export async function moveAccountStage(accountId: string, newStage: string) {
   await requireStaffSession();
@@ -324,6 +325,6 @@ export async function addCredentialAction(accountId: string, formData: FormData)
   const label = String(formData.get("label") ?? "").trim();
   const value = String(formData.get("value") ?? "").trim();
   if (!label || !value) return;
-  await prisma.credential.create({ data: { accountId, label, value } });
+  await prisma.credential.create({ data: { accountId, label, value: encryptSecret(value) } });
   revalidatePath(`/admin/ugyfelek/${accountId}`);
 }
