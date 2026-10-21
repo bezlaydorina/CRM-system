@@ -148,27 +148,74 @@ Innentől az állapotot (Elküldve → Megtekintve → Aláírva/Elutasítva) a 
 
 `DROPBOX_SIGN_API_KEY` nélkül a "Küldés e-aláírásra" gomb egy hibaüzenettel tér vissza; a korábbi kézi állapotkövetés (Elküldés/Megtekintve/Aláírva gombok) a még nem e-aláírásra küldött szerződéseknél (pl. papíron aláírt szerződéseknél) változatlanul elérhető marad.
 
+## Jóváhagyások
+
+A "CSM Jóváhagyás" oldalon a "+ Új jóváhagyásra váró tétel" formmal staff valódi fájlt (kép/videó) tölthet fel, ami a meglévő helyi fájltárolási mintát követi (`public/uploads/<accountId>/approvals/`). Nincs hozzá szükséges külső API-kulcs vagy fiók.
+
+## Automatikus riportok (Vercel Cron)
+
+Minden aktív, élő (nem teszt, nem belső sales) ügyfélnek hetente/havonta automatikusan legenerálódik és ki is küldésre kerül a riport a `vercel.json`-ban definiált Vercel Cron job-okon keresztül (`/api/cron/reports?period=WEEK|MONTH`).
+
+1. Add meg a `CRON_SECRET` változót a Vercel környezeti változói közt (bármilyen hosszú, random string - pl. `openssl rand -base64 32`).
+2. A Vercel automatikusan beállítja a `vercel.json`-ban megadott cron ütemezést a deploy után - nincs külön teendő.
+
+`CRON_SECRET` nélkül a `/api/cron/reports` végpont 503-at ad és nem fut le (nincs publikusan hívható riport-spam vektor); hibás `Authorization` headerrel 401-et. A manuális riport-készítés (ügyfélportál "Riportok" oldal) ettől függetlenül mindig működik.
+
+## Affiliate program
+
+Az ügyfélportál "Affiliate" oldalán minden ügyfélnek van egy valódi ajánlói kódja. Új ügyfél felvételekor (admin "+ Új ügyfél" form) staff megadhatja a kapott ajánlói kódot - ez összeköti az ajánló és az ajánlott account-ot "függőben" állapotban, majd a szerződés aláírásakor (kézi állapotváltás vagy Dropbox Sign webhook egyaránt) automatikusan jóváírásra kerül. Nincs hozzá szükséges külső API-kulcs; a jutalom tényleges pénzügyi érvényesítése (pl. 1 hónap jóváírása a számlázásban) staff feladata a Fizetések oldalon.
+
+## Értékesítési felvétel / Onboarding kérdőív
+
+Az admin Beállítások oldalon staff szabadon összeállíthatja a két kérdőív (Értékesítési felvétel, Onboarding kérdőív) mezőit - ugyanazzal a JSON-alapú dinamikus mező-motorral, mint a mini-CRM Opportunity egyéni mezői. A kérdések szervezet-szintűek (minden ügyfélnél ugyanazok), a válaszok account-szintűek, és az ügyfél Adatok fülén tölthetők ki.
+
+## Ügynökség-szintű branding
+
+Az admin Beállítások oldalon valódi logót lehet feltölteni és márkaszínt beállítani, ami azonnal (build nélkül) megjelenik mind az admin felületen, mind az összes ügyfél portálján. Az egyedi domain mező csak rögzítésre kerül - a tényleges DNS-kötéshez add hozzá ugyanezt a domaint a Vercel projekt "Domains" beállításainál, és állítsd be a kért DNS rekordot a domain-szolgáltatódnál.
+
+## Sötét téma
+
+Az admin és a portál Beállítások oldalán is valódi, nézőnkénti (localStorage-ban perzisztált) Világos/Sötét/Rendszer kapcsoló van, FOUC-mentes betöltéssel. A megosztott UI-elemek (kártyák, badge-ek, az admin fejléc) és a teljes alap háttér/szöveg réteg helyesen vált sötét módba; egyedi, oldal-specifikus elemek (pl. egyes táblázatok, nyers input mezők) stílusa ebben a körben nem lett egyenként átnézve.
+
+## Hitelesítő adatok titkosítása
+
+Az ügyfél Adatok fülén rögzített belépési adatok (pl. weboldal admin jelszavak) `CREDENTIALS_ENCRYPTION_KEY` esetén AES-256-GCM-mel titkosítva kerülnek tárolásra az adatbázisban.
+
+1. Generálj egy kulcsot: `openssl rand -base64 32`.
+2. Add meg a `CREDENTIALS_ENCRYPTION_KEY` változót a Vercel környezeti változói közt.
+
+`CREDENTIALS_ENCRYPTION_KEY` nélkül a belépési adatok síkszövegként kerülnek tárolásra (mint korábban) - a funkció enélkül is változatlanul működik, csak titkosítás nélkül.
+
 ## Megvalósított modulok
 
 - **Auth & multi-tenant izoláció** – staff/kliens session, admin impersonáció, `account_id` szintű szűrés minden lekérdezésen, token-alapú meghívó/jelszó-beállító linkek (`/jelszo-beallitas/:token`) valós email-küldéssel (Resend, lásd lent)
 - **Ügyfelek** – Lista + 12 szakaszos életciklus Kanban (drag&drop), 5 fülös adatlap (Áttekintés / CRM és leadek / Adatok és űrlapok / Projektek és szolgáltatások / Pénzügy), CSV export, jelszó módosítás, archiválás, törlés
 - **Mini-CRM** (ügyfelenként) – több pipeline, egyéni szakaszok, JSON-alapú egyéni mező builder, Kanban + Kapcsolatok táblázat nézet, 4 fülös opportunity szerkesztő (adatok / jegyzetek / tennivalók / aktivitás napló), webhook-alapú lead-befogadás (`/api/webhook/crm/:token`), globális "beérkező leadek" feed
 - **Feladatkezelés** – csapattagonkénti Kanban tábla, kategória szűrők, automatikus feladat-generálás (új ügyfél, elakadt onboarding, sikertelen fizetés)
-- **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon
+- **CSM Jóváhagyás** – `draft → pending_internal → pending_client → approved/rejected` állapotgép, ugyanaz a komponens az admin és a kliens oldalon, valódi fájlfeltöltéssel új tételekhez (lásd lent)
 - **Csapat** – csapattag-kezelés valós Google Calendar-csatlakoztatással (lásd fent)
 - **Szerződések** – valódi PDF-generálás + e-aláírás Dropbox Sign-on keresztül, automatikus állapotkövetéssel (lásd lent)
 - **The Code asszisztens** – valódi Claude API-hívás az ügyfél saját CRM-adatain, szabályalapú fallback-kel (lásd lent)
 - **Naptár** – közös csapat-naptár, csapattagonkénti Google Calendar OAuth-csatlakoztatás, valódi Meet-link generálás csatlakoztatott csapattagoknál (lásd lent)
 - **Fizetések** – egyszeri/havi díjak nyilvántartása, valódi bankkártyás fizetés Barion Smart Gateway-en keresztül (admin + ügyfélportál "Fizetések" oldal), webhook + redirect alapú állapot-szinkron, kézi "Fizetve" jelölés banki átutaláshoz, pénzügyi rekonstrukció
-- **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (automata + korlátozott manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate, Beállítások
+- **Ügyfélportál** – Kezdőlap (metrikák, milestone-ünneplés), Riportok (valódi automata heti/havi generálás Vercel Cronnal + manuális), Jóváhagyások, Üzenetek, Fájlfeltöltés (valós lokális tárolással), saját CRM, Affiliate (valós ajánlás-követés), Beállítások (sötét téma)
 - **PWA telepítés** – manifest, service worker, app ikonok, valódi "Telepítsd appként" gomb (lásd lent)
 - **Sales tab** – az ügynökség saját belső sales pipeline-ja (ugyanaz a CRM UI, más account-kontextus)
 - **Projektek** (Weboldalak / Webshopok / Applikációk / Automatizációk / Egyedi rendszerek) – kategóriánkénti Kanban tábla (`Igényfelmérés → Tervezés → Fejlesztés → Tesztelés → Ügyfél jóváhagyás → Élesítve → Karbantartás`), projekt létrehozása ügyfélhez kötve, felelős-hozzárendelés, büdzsé és határidő követéssel
+- **Értékesítési felvétel / Onboarding kérdőív** – szervezet-szintű, szerkeszthető kérdés-séma, account-szintű válaszokkal (lásd lent)
+- **Ügynökség branding** – valódi logó + márkaszín testreszabás, azonnal érvényesül admin + portál felületen (lásd lent)
+- **Biztonság** – ügyfél-hitelesítő adatok titkosítva (AES-256-GCM) tárolva (lásd lent)
 
 ## Nincs már stub rész
 
-Minden funkció valódi, külső szolgáltatásra épülő integrációval működik (saját API-kulcs nélkül mindegyik graceful fallback-kel, sosem hibával leáll): account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc, a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás, az email küldés (Resend), a fizetés (Barion), a Google Calendar szinkron, a PWA telepítés, a The Code asszisztens (Claude API) és a szerződések e-aláírása (Dropbox Sign) – mind saját Postgres adatbázisra írva.
+Minden funkció valódi, külső szolgáltatásra épülő integrációval működik (saját API-kulcs nélkül mindegyik graceful fallback-kel, sosem hibával leáll): account/kontakt/csapat CRUD, a teljes CRM pipeline motor, a jóváhagyási lánc (valós fájlfeltöltéssel), a webhook-alapú lead-befogadás, a fájlfeltöltés, a projekt-nyilvántartás, az email küldés (Resend), a fizetés (Barion), a Google Calendar szinkron, a PWA telepítés, a The Code asszisztens (Claude API), a szerződések e-aláírása (Dropbox Sign), az automatikus riport-generálás (Vercel Cron), az affiliate ajánlás-követés, az értékesítési felvétel/onboarding kérdőív, az ügynökség branding és a hitelesítő adatok titkosítása – mind saját Postgres adatbázisra írva.
+
+**Tudatos, dokumentált korlátok** (nem hiányzó funkciók, hanem ismert, ésszerű scope-határok):
+
+- **Sötét téma** – a megosztott UI-elemek és az alap háttér/szöveg réteg helyesen vált, de néhány oldal-specifikus, literál színt használó elem (pl. egyes táblázatok) stílusa nincs egyenként átnézve.
+- **Egyedi domain** (ügynökség branding) – csak rögzítésre kerül, a tényleges DNS-kötés a Vercel projekt Domains beállításainál történik.
+- **Credential titkosítás kulcsrotáció** – ha a `CREDENTIALS_ENCRYPTION_KEY` megváltozik/törlődik, a korábban azzal titkosított adatok nem fejthetők vissza (ez minden szimmetrikus titkosításos megoldás velejárója, nem erre a projektre jellemző hiányosság).
 
 ## Adatmodell
 
-Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, Credential, AuthToken) a specifikáció 3. fejezete alapján.
+Lásd `prisma/schema.prisma` – az összes entitás (Organization, Account, Contact, TeamMember, TeamAssignment, Pipeline, Stage, Opportunity, CustomFieldDefinition, Webhook, Task, Project, ApprovalItem, Payment, Contract, Report, Conversation/Message, FileAsset, CalendarEvent, Credential, AuthToken, Referral, IntakeFormFieldDefinition, IntakeFormResponse) a specifikáció 3. fejezete alapján.

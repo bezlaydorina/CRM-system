@@ -22,12 +22,25 @@ export const viewport: Viewport = {
   themeColor: "#4a102a",
 };
 
+const THEME_INIT_SCRIPT = `
+try {
+  var mode = localStorage.getItem("theme") || "system";
+  var isDark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  if (isDark) document.documentElement.classList.add("dark");
+} catch (e) {}
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="hu"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Blokkoló script a hidratáció előtt, hogy ne villanjon fel a rossz téma (FOUC) - lásd ThemeToggle. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
         {children}
         <RegisterServiceWorker />

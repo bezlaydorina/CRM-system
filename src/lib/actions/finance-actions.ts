@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireStaffSession } from "@/lib/auth";
 import { generateContractPdf } from "@/lib/contract-pdf";
 import { isDropboxSignConfigured, sendContractForSignature } from "@/lib/dropbox-sign";
+import { rewardReferralIfSigned } from "@/lib/referrals";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
@@ -59,10 +60,11 @@ export async function createContractAction(formData: FormData) {
 
 export async function updateContractStatusAction(contractId: string, status: string) {
   await requireStaffSession();
-  await prisma.contract.update({
+  const contract = await prisma.contract.update({
     where: { id: contractId },
     data: { status, signedAt: status === "SIGNED" ? new Date() : undefined },
   });
+  if (status === "SIGNED") await rewardReferralIfSigned(contract.accountId);
   revalidateFinanceSurfaces();
 }
 

@@ -10,6 +10,8 @@ import { ACCOUNT_LIFECYCLE_STAGES, ACCOUNT_PACKAGES } from "@/lib/enums";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { portalInviteEmail, portalReadyEmail } from "@/lib/email-templates";
 import { createPortalSetupToken } from "@/lib/auth-tokens";
+import { linkReferralIfValid } from "@/lib/referrals";
+import { encryptSecret } from "@/lib/crypto";
 
 export async function moveAccountStage(accountId: string, newStage: string) {
   await requireStaffSession();
@@ -99,6 +101,7 @@ export async function quickSaveAccountAction(formData: FormData) {
   });
 
   await createDefaultCrmSetup(account.id);
+  await linkReferralIfValid(account.id, formData.get("referralCode") as string | null);
 
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;
@@ -155,6 +158,7 @@ export async function createFullAccountAction(formData: FormData) {
   });
 
   await createDefaultCrmSetup(account.id);
+  await linkReferralIfValid(account.id, formData.get("referralCode") as string | null);
 
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;
@@ -321,6 +325,6 @@ export async function addCredentialAction(accountId: string, formData: FormData)
   const label = String(formData.get("label") ?? "").trim();
   const value = String(formData.get("value") ?? "").trim();
   if (!label || !value) return;
-  await prisma.credential.create({ data: { accountId, label, value } });
+  await prisma.credential.create({ data: { accountId, label, value: encryptSecret(value) } });
   revalidatePath(`/admin/ugyfelek/${accountId}`);
 }

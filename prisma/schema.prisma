@@ -20,11 +20,15 @@ datasource db {
 model Organization {
   id             String          @id @default(cuid())
   name           String
+  logoUrl        String? // ügynökség logó - lásd admin Beállítások
+  primaryColor   String? // hex szín, felülírja a --color-brand-maroon CSS változót
+  customDomain   String? // tájékoztató jellegű - a tényleges DNS/domain-kötés a Vercel projekt Domains beállításaiban történik
   createdAt      DateTime        @default(now())
-  accounts       Account[]
-  teamMembers    TeamMember[]
-  tasks          Task[]
-  calendarEvents CalendarEvent[]
+  accounts               Account[]
+  teamMembers            TeamMember[]
+  tasks                  Task[]
+  calendarEvents         CalendarEvent[]
+  intakeFormFieldDefs    IntakeFormFieldDefinition[]
 }
 
 model TeamMember {
@@ -90,20 +94,38 @@ model Account {
 
   createdAt DateTime @default(now())
 
-  contacts        Contact[]
-  assignments     TeamAssignment[]
-  pipelines       Pipeline[]
-  tasks           Task[]
-  approvalItems   ApprovalItem[]
-  payments        Payment[]
-  contracts       Contract[]
-  reports         Report[]
-  conversation    Conversation?
-  fileAssets      FileAsset[]
-  credentials     Credential[]
-  activityEntries ActivityLogEntry[]
-  calendarEvents  CalendarEvent[]
-  projects        Project[]
+  contacts         Contact[]
+  assignments      TeamAssignment[]
+  pipelines        Pipeline[]
+  tasks            Task[]
+  approvalItems    ApprovalItem[]
+  payments         Payment[]
+  contracts        Contract[]
+  reports          Report[]
+  conversation     Conversation?
+  fileAssets       FileAsset[]
+  credentials      Credential[]
+  activityEntries  ActivityLogEntry[]
+  calendarEvents   CalendarEvent[]
+  projects         Project[]
+  referralsMade    Referral[] @relation("ReferralsMade")
+  referralReceived Referral?  @relation("ReferralReceived")
+  intakeFormResponses IntakeFormResponse[]
+}
+
+// ---------------------------------------------------------------------------
+// Affiliate / ajánlói program
+// ---------------------------------------------------------------------------
+
+model Referral {
+  id                String    @id @default(cuid())
+  referrerAccountId String
+  referrerAccount   Account   @relation("ReferralsMade", fields: [referrerAccountId], references: [id])
+  referredAccountId String    @unique
+  referredAccount   Account   @relation("ReferralReceived", fields: [referredAccountId], references: [id])
+  status            String    @default("PENDING") // PENDING | REWARDED
+  rewardedAt        DateTime?
+  createdAt         DateTime  @default(now())
 }
 
 model Contact {
@@ -251,6 +273,37 @@ model CustomFieldDefinition {
   section    String   @default("Általános")
   options    String   @default("[]") // JSON array, for SELECT/MULTISELECT
   order      Int      @default(0)
+}
+
+// ---------------------------------------------------------------------------
+// Értékesítési felvétel / Onboarding kérdőív - szervezet-szintű kérdés-séma,
+// account-szintű válaszokkal (ugyanaz a JSON-alapú mező-motor, mint a
+// mini-CRM egyéni mezőinél, csak nem Pipeline-hoz, hanem Organization-höz
+// kötve, mert ez a két kérdőív minden ügyfélnél ugyanaz).
+// ---------------------------------------------------------------------------
+
+model IntakeFormFieldDefinition {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  formKey        String // SALES_INTAKE | ONBOARDING
+  name           String
+  type           String // TEXT|LONG_TEXT|NUMBER|DATE|SELECT|MULTISELECT|EMAIL|PHONE|URL|CHECKBOX
+  section        String       @default("Általános")
+  options        String       @default("[]") // JSON array, for SELECT/MULTISELECT
+  order          Int          @default(0)
+}
+
+model IntakeFormResponse {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id])
+  formKey   String // SALES_INTAKE | ONBOARDING
+  answers   String   @default("{}") // JSON blob kulcsolva IntakeFormFieldDefinition.id szerint
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([accountId, formKey])
 }
 
 model Webhook {

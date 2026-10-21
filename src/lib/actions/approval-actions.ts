@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { mkdir, writeFile } from "fs/promises";
+import path from "path";
 import { prisma } from "@/lib/prisma";
 import { getSession, requireStaffSession } from "@/lib/auth";
 
@@ -37,10 +39,19 @@ export async function bulkDecideApprovalsAction(approvalIds: string[], decision:
   await Promise.all(approvalIds.map((id) => decideApprovalAction(id, decision)));
 }
 
-export async function createApprovalItemAction(accountId: string, formData: FormData) {
+export async function createApprovalItemAction(formData: FormData) {
   const session = await requireStaffSession();
+  const accountId = String(formData.get("accountId") ?? "");
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) return;
+  const file = formData.get("file");
+  if (!accountId || !title || !(file instanceof File) || file.size === 0) return;
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const fileName = `${Date.now()}-${safeName}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads", accountId, "approvals");
+  await mkdir(uploadDir, { recursive: true });
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await writeFile(path.join(uploadDir, fileName), buffer);
 
   await prisma.approvalItem.create({
     data: {
@@ -48,7 +59,7 @@ export async function createApprovalItemAction(accountId: string, formData: Form
       title,
       type: String(formData.get("type") ?? "CREATIVE"),
       status: "PENDING_INTERNAL",
-      fileUrl: String(formData.get("fileUrl") ?? "") || "/mock-assets/creative-placeholder.svg",
+      fileUrl: `/uploads/${accountId}/approvals/${fileName}`,
       createdById: session.teamMemberId,
     },
   });

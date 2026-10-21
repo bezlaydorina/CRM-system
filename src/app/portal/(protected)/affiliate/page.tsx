@@ -1,11 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
-import { PageHeader, Card, Badge } from "@/components/ui";
+import { PageHeader, Card, Badge, EmptyState } from "@/components/ui";
+import { referralCodeForAccount } from "@/lib/referrals";
 
 export default async function AffiliatePage() {
   const accountId = (await getEffectiveAccountId())!;
-  const account = await prisma.account.findUnique({ where: { id: accountId } });
-  const referralCode = `THECODE-${accountId.slice(0, 6).toUpperCase()}`;
+  const [account, referrals] = await Promise.all([
+    prisma.account.findUnique({ where: { id: accountId } }),
+    prisma.referral.findMany({ where: { referrerAccountId: accountId }, include: { referredAccount: true }, orderBy: { createdAt: "desc" } }),
+  ]);
+  const referralCode = referralCodeForAccount(accountId);
+  const rewardedCount = referrals.filter((r) => r.status === "REWARDED").length;
 
   return (
     <div>
@@ -14,7 +19,7 @@ export default async function AffiliatePage() {
       <Card className="mb-6">
         <p className="text-sm text-zinc-600">Az egyedi ajánlói kódod:</p>
         <p className="mt-1 font-mono text-xl font-semibold text-brand-gold-dark">{referralCode}</p>
-        <Badge color="green">0 sikeres ajánlás eddig</Badge>
+        <Badge color="green">{rewardedCount} sikeres ajánlás eddig</Badge>
       </Card>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -23,9 +28,26 @@ export default async function AffiliatePage() {
         <Step n={3} title="Válassz csomagot, örökre ingyen" desc="Minden sikeres ajánlás után 1 hónap ingyenes csomagot kapsz, halmozva." />
       </div>
 
+      <Card className="mt-6">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-700">Ajánlásaid</h2>
+        {referrals.length === 0 ? (
+          <EmptyState text="Még nincs rögzített ajánlásod – add ki a kódodat, és amikor egy új ügyfél ezzel regisztrál nálunk, itt megjelenik." />
+        ) : (
+          <div className="space-y-1.5">
+            {referrals.map((r) => (
+              <div key={r.id} className="flex items-center justify-between rounded-lg border border-zinc-100 px-3 py-1.5 text-sm">
+                <span>{r.referredAccount.name}</span>
+                <Badge color={r.status === "REWARDED" ? "green" : "amber"}>{r.status === "REWARDED" ? "Jóváírva" : "Folyamatban"}</Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
       <p className="mt-6 text-xs text-zinc-400">
-        Account: {account?.name} · Az affiliate kifizetés-követés és az automatikus jóváírás ebben az MVP-ben statikus
-        demó, valós pénzügyi motort nem indít el.
+        Account: {account?.name} · Az ajánlás valóban rögzítésre kerül, és a szerződés aláírásakor automatikusan
+        jóváírásra kerül; a jutalom tényleges kifizetése (pl. 1 hónap jóváírása a számlázásban) ebben az MVP-ben
+        nem indít el valós pénzügyi motort, azt staff kézzel érvényesíti a Fizetések oldalon.
       </p>
     </div>
   );

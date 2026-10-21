@@ -6,15 +6,17 @@ export function PortalShell({
   account,
   contact,
   isImpersonating,
+  primaryColor,
   children,
 }: {
   account: Account;
   contact: Contact | null;
   isImpersonating: boolean;
+  primaryColor: string | null;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full bg-brand-bg">
+    <div className="flex min-h-screen w-full bg-brand-bg" style={primaryColor ? ({ "--color-brand-maroon": primaryColor } as React.CSSProperties) : undefined}>
       <aside className="flex w-60 flex-shrink-0 flex-col bg-brand-maroon text-white">
         <div className="flex items-center gap-2 px-4 py-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold">

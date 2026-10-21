@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { hu } from "date-fns/locale";
 import { Badge } from "@/components/ui";
-import { CUSTOM_FIELD_TYPES } from "@/lib/enums";
+import { DynamicFieldInput } from "@/components/dynamic-field-input";
 import {
   getOpportunityDetail,
   updateOpportunityAction,
@@ -107,7 +107,7 @@ export function OpportunityDrawer({ opportunityId, onClose }: { opportunityId: s
                       <p className="mb-2 text-xs font-semibold uppercase text-zinc-400">Egyéni mezők</p>
                       <div className="space-y-2">
                         {detail.stage.pipeline.customFieldDefs.map((f) => (
-                          <CustomFieldInput key={f.id} field={f} value={detail.customFieldsParsed[f.id]} />
+                          <DynamicFieldInput key={f.id} field={f} value={detail.customFieldsParsed[f.id]} />
                         ))}
                       </div>
                     </div>
@@ -237,55 +237,3 @@ function TextField({
   );
 }
 
-function CustomFieldInput({
-  field,
-  value,
-}: {
-  field: { id: string; name: string; type: string; options: string };
-  value: unknown;
-}) {
-  const name = `cf_${field.id}`;
-  const options: string[] = JSON.parse(field.options || "[]");
-
-  if (field.type === "CHECKBOX") {
-    return (
-      <label className="flex items-center gap-2 text-xs text-zinc-600">
-        <input type="checkbox" name={name} defaultChecked={!!value} /> {field.name}
-      </label>
-    );
-  }
-  if (field.type === "SELECT" || field.type === "MULTISELECT") {
-    return (
-      <label className="block text-xs font-medium text-zinc-600">
-        {field.name} <span className="text-zinc-400">({CUSTOM_FIELD_TYPES.find((t) => t.key === field.type)?.label})</span>
-        <select name={name} defaultValue={typeof value === "string" ? value : ""} className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm">
-          <option value="">—</option>
-          {options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-      </label>
-    );
-  }
-  if (field.type === "LONG_TEXT") {
-    return (
-      <label className="block text-xs font-medium text-zinc-600">
-        {field.name}
-        <textarea name={name} defaultValue={typeof value === "string" ? value : ""} className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" rows={2} />
-      </label>
-    );
-  }
-  return (
-    <label className="block text-xs font-medium text-zinc-600">
-      {field.name}
-      <input
-        name={name}
-        type={field.type === "NUMBER" ? "number" : field.type === "DATE" ? "date" : "text"}
-        defaultValue={value != null ? String(value) : ""}
-        className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm"
-      />
-    </label>
-  );
-}
