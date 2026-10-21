@@ -16,16 +16,19 @@ type Member = {
 };
 
 type AccountLite = { id: string; name: string; status: string } | null;
+type OrgBranding = { name: string; logoUrl: string | null; primaryColor: string | null };
 
 export function AdminShell({
   member,
   accounts,
   impersonatedAccount,
+  org,
   children,
 }: {
   member: Member;
   accounts: { id: string; name: string; status: string }[];
   impersonatedAccount: AccountLite;
+  org: OrgBranding;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -39,12 +42,17 @@ export function AdminShell({
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-brand-bg">
+    <div className="flex min-h-screen w-full bg-brand-bg" style={org.primaryColor ? ({ "--color-brand-maroon": org.primaryColor } as React.CSSProperties) : undefined}>
       <aside className="flex w-64 flex-shrink-0 flex-col bg-brand-maroon text-white">
         <div className="flex items-center gap-2 px-4 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold">T</div>
+          {org.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- felhasználó által feltöltött logó
+            <img src={org.logoUrl} alt={org.name} className="h-8 w-8 rounded-lg object-contain" />
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold">{org.name.slice(0, 1).toUpperCase()}</div>
+          )}
           <div>
-            <p className="text-sm font-semibold leading-tight">The Code</p>
+            <p className="text-sm font-semibold leading-tight">{org.name}</p>
             <p className="text-[11px] text-white/50 leading-tight">Admin felület</p>
           </div>
         </div>

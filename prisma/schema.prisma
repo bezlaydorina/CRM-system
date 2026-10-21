@@ -20,6 +20,9 @@ datasource db {
 model Organization {
   id             String          @id @default(cuid())
   name           String
+  logoUrl        String? // ügynökség logó - lásd admin Beállítások
+  primaryColor   String? // hex szín, felülírja a --color-brand-maroon CSS változót
+  customDomain   String? // tájékoztató jellegű - a tényleges DNS/domain-kötés a Vercel projekt Domains beállításaiban történik
   createdAt      DateTime        @default(now())
   accounts               Account[]
   teamMembers            TeamMember[]

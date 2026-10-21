@@ -10,8 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
 
-  /* Brand palette: Mély bordó, Pezsgőarany, Háttér, Szöveg */
+/*
+ * Brand palette: Mély bordó, Pezsgőarany, Háttér, Szöveg.
+ * Szándékosan NEM "@theme inline" (ami a literál értéket sütné bele minden
+ * utility class-ba build-időben) - sima "@theme" blokkban a generált
+ * utility-k var(--color-brand-maroon)-ra hivatkoznak, így az ügynökség
+ * saját márkaszíne (lásd admin Beállítások) futásidőben, egy inline style-lal
+ * felülírható a gyökér CSS változón, build nélkül.
+ */
+@theme {
   --color-brand-maroon: #4a102a;
   --color-brand-gold: #b89a62;
   --color-brand-gold-dark: #9c8353;

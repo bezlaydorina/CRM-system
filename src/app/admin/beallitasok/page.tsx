@@ -3,6 +3,7 @@ import { PageHeader, Card, Badge } from "@/components/ui";
 import { getCurrentTeamMember } from "@/lib/auth";
 import { CUSTOM_FIELD_TYPES } from "@/lib/enums";
 import { addIntakeFieldAction, deleteIntakeFieldAction } from "@/lib/actions/intake-actions";
+import { updateOrganizationBrandingAction } from "@/lib/actions/org-actions";
 
 export default async function AdminSettingsPage() {
   const member = await getCurrentTeamMember();
@@ -19,7 +20,36 @@ export default async function AdminSettingsPage() {
         <Card>
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Ügynökség</h2>
           <p className="text-sm text-zinc-600">Név: {org?.name}</p>
-          <p className="mt-1 text-xs text-zinc-400">Az ügynökség szintű brand/logó/domain testreszabás ebben az MVP-ben nincs implementálva.</p>
+          <form action={updateOrganizationBrandingAction} className="mt-3 space-y-3 border-t border-zinc-100 pt-3">
+            <div className="flex items-center gap-3">
+              {org?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- felhasználó által feltöltött, nem build-időben ismert méretű logó
+                <img src={org.logoUrl} alt="Logó" className="h-10 w-10 rounded-lg object-contain" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-gold text-sm font-bold text-white">{org?.name?.slice(0, 1) ?? "T"}</div>
+              )}
+              <label className="text-xs font-medium text-zinc-600">
+                Logó csere
+                <input name="logo" type="file" accept="image/*" className="mt-1 block text-xs file:mr-2 file:rounded-md file:border-0 file:bg-zinc-100 file:px-2 file:py-1 file:text-xs" />
+              </label>
+            </div>
+            <label className="block text-xs font-medium text-zinc-600">
+              Elsődleges márkaszín
+              <div className="mt-1 flex items-center gap-2">
+                <input name="primaryColor" type="color" defaultValue={org?.primaryColor ?? "#4a102a"} className="h-8 w-12 rounded border border-zinc-300" />
+                <span className="font-mono text-xs text-zinc-500">{org?.primaryColor ?? "#4a102a (alapértelmezett)"}</span>
+              </div>
+            </label>
+            <label className="block text-xs font-medium text-zinc-600">
+              Egyedi domain
+              <input name="customDomain" defaultValue={org?.customDomain ?? ""} placeholder="crm.ugynokseged.hu" className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm" />
+            </label>
+            <p className="text-xs text-zinc-400">
+              A domain itt csak rögzítésre kerül - a tényleges DNS-kötéshez add hozzá ugyanezt a domaint a Vercel
+              projekt &quot;Domains&quot; beállításainál, és állítsd be a kért DNS rekordot a domain-szolgáltatódnál.
+            </p>
+            <button className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white">Mentés</button>
+          </form>
         </Card>
         <Card>
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Saját profil</h2>

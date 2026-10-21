@@ -16,10 +16,13 @@ export default async function PortalLayout({ children }: { children: React.React
   const account = await prisma.account.findUnique({ where: { id: accountId } });
   if (!account) redirect("/admin");
 
-  const contact = session.kind === "client" ? await prisma.contact.findUnique({ where: { id: session.contactId } }) : null;
+  const [contact, org] = await Promise.all([
+    session.kind === "client" ? prisma.contact.findUnique({ where: { id: session.contactId } }) : null,
+    prisma.organization.findUnique({ where: { id: account.organizationId }, select: { primaryColor: true } }),
+  ]);
 
   return (
-    <PortalShell account={account} contact={contact} isImpersonating={session.kind === "staff"}>
+    <PortalShell account={account} contact={contact} isImpersonating={session.kind === "staff"} primaryColor={org?.primaryColor ?? null}>
       {children}
     </PortalShell>
   );

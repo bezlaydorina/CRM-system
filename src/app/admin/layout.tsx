@@ -13,6 +13,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
   if (!member) redirect("/login");
 
+  const org = await prisma.organization.findUnique({
+    where: { id: member.organizationId },
+    select: { name: true, logoUrl: true, primaryColor: true },
+  });
+
   const accounts = await prisma.account.findMany({
     where: { isInternalSales: false },
     select: { id: true, name: true, status: true },
@@ -24,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     : null;
 
   return (
-    <AdminShell member={member} accounts={accounts} impersonatedAccount={impersonatedAccount}>
+    <AdminShell member={member} accounts={accounts} impersonatedAccount={impersonatedAccount} org={org ?? { name: "The Code", logoUrl: null, primaryColor: null }}>
       {children}
     </AdminShell>
   );
