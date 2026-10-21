@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui";
 import { ContractsTable } from "@/components/finance/contracts-table";
+import { resolveFileUrls } from "@/lib/storage";
 
 export default async function SalesContractsPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
@@ -9,6 +10,8 @@ export default async function SalesContractsPage({ searchParams }: { searchParam
     include: { account: true },
     orderBy: { createdAt: "desc" },
   });
+  const resolvedUrls = await resolveFileUrls(contracts.map((c) => c.documentUrl));
+  const resolvedContracts = contracts.map((c) => ({ ...c, documentUrl: c.documentUrl ? resolvedUrls[c.documentUrl] ?? c.documentUrl : null }));
 
   return (
     <div>
@@ -22,7 +25,7 @@ export default async function SalesContractsPage({ searchParams }: { searchParam
               : "Az e-aláírásra küldés sikertelen volt, próbáld újra."}
         </div>
       ) : null}
-      <ContractsTable contracts={contracts} />
+      <ContractsTable contracts={resolvedContracts} />
     </div>
   );
 }

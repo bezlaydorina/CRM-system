@@ -80,6 +80,7 @@ Admin nézetben a fejléc keresőjével bármelyik ügyfél portálját megnyith
    - `NEXT_PUBLIC_APP_URL` = az éles domain (pl. `https://crm.thecode.hu`) – ez kerül bele az emailekben küldött linkekbe és a Barion redirect/callback URL-jeibe.
    - `BARION_POS_KEY`, `BARION_PAYEE_EMAIL`, `BARION_ENV` = lásd a "Fizetés (Barion)" szekciót lent – enélkül a "Fizetés" gomb hibaüzenetet ad, a többi funkció változatlanul működik.
    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` = lásd a "Google Calendar szinkron" szekciót lent – enélkül a "Csatlakoztatás" gomb hibaüzenetet ad, a többi funkció változatlanul működik.
+   - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` = lásd a "Fájltárolás (Supabase Storage)" szekciót lent – enélkül minden fájlfeltöltés (portál fájlok, jóváhagyások, logó, szerződés-PDF-ek) egy barátságos hibaüzenettel tér vissza, a többi funkció változatlanul működik.
 5. **Deploy** – a build parancs (`prisma migrate deploy && prisma generate && next build`, lásd `package.json`) minden deploy-nál automatikusan lefuttatja a függő migrációkat az éles adatbázison.
 6. **Seedelés (opcionális, csak első alkalommal)** – a demó adatok (`npm run db:seed`) kitalált ügyfeleket hoznak létre; éles induláshoz ezt át lehet hagyni, és az admin a "+ Új ügyfél" formmal viszi fel az első valós ügyfeleket. Ha mégis kellenek demó adatok a teszteléshez, a seedet a Supabase connection stringgel helyben kell futtatni (`DATABASE_URL=... DIRECT_URL=... npm run db:seed`), mert a Vercel build nem futtatja automatikusan.
 
@@ -148,9 +149,20 @@ Innentől az állapotot (Elküldve → Megtekintve → Aláírva/Elutasítva) a 
 
 `DROPBOX_SIGN_API_KEY` nélkül a "Küldés e-aláírásra" gomb egy hibaüzenettel tér vissza; a korábbi kézi állapotkövetés (Elküldés/Megtekintve/Aláírva gombok) a még nem e-aláírásra küldött szerződéseknél (pl. papíron aláírt szerződéseknél) változatlanul elérhető marad.
 
+## Fájltárolás (Supabase Storage)
+
+Minden fájlfeltöltés (ügyfélportál fájlok, admin "CSM Jóváhagyás" tételek, ügynökség-logó, generált és aláírt szerződés-PDF-ek) egy privát Supabase Storage bucketbe (`uploads`) kerül a Supabase Storage REST API-ján keresztül (`src/lib/storage.ts`), nem a szerver lemezére – ez szükséges, mert Vercelen a `public/` mappa build után csak olvasható, a deploy-ok közt semmi nem marad meg belőle.
+
+1. Hozz létre egy Supabase projektet, Storage alatt egy **privát** `uploads` bucketet (max. fájlméret: 50 MB).
+2. Project Settings → API alatt másold ki a Project URL-t és a `service_role` kulcsot.
+3. Add meg a `SUPABASE_URL` és `SUPABASE_SERVICE_ROLE_KEY` változókat a Vercel környezeti változói közt. **Csak szerveroldalon** használt titkos kulcsok – soha ne kapjanak `NEXT_PUBLIC_` prefixet, és soha nem jutnak el a böngészőhöz.
+4. A böngészős feltöltések (portál fájlok, jóváhagyások, logó) kétlépésben történnek: a szerver egy rövid életű, aláírt feltöltési URL-t ad, a fájl közvetlenül a böngészőből megy fel a Supabase-be (a Vercel szerver-akció body-méret korlátját elkerülve), majd a szerver ellenőrzi, hogy a fájl ténylegesen megérkezett, mielőtt elmentené az adatbázisba. Az adatbázisban mindenhol csak a bucketen belüli útvonal (nem URL) tárolódik; megjelenítéskor a szerver mindig frissen generál egy lejáró, aláírt URL-t (`resolveFileUrls`) – dokumentumoknál/fájloknál 1 órás, a logónál 24 órás lejárattal.
+
+`SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` nélkül minden feltöltés egy barátságos hibaüzenettel tér vissza, a meglévő oldalak és a már korábban (demó adatként) rögzített `/`-rel kezdődő régi fájlhivatkozások változatlanul betöltenek.
+
 ## Jóváhagyások
 
-A "CSM Jóváhagyás" oldalon a "+ Új jóváhagyásra váró tétel" formmal staff valódi fájlt (kép/videó) tölthet fel, ami a meglévő helyi fájltárolási mintát követi (`public/uploads/<accountId>/approvals/`). Nincs hozzá szükséges külső API-kulcs vagy fiók.
+A "CSM Jóváhagyás" oldalon a "+ Új jóváhagyásra váró tétel" formmal staff valódi fájlt (kép/videó) tölthet fel, ami a Supabase Storage-ba kerül (lásd fent). Nincs hozzá szükséges külön külső API-kulcs vagy fiók a Supabase-en felül.
 
 ## Automatikus riportok (Vercel Cron)
 

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { PageHeader, Card } from "@/components/ui";
 import { ContractsTable } from "@/components/finance/contracts-table";
 import { createContractAction } from "@/lib/actions/finance-actions";
+import { resolveFileUrls } from "@/lib/storage";
 
 export default async function ContractsPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
@@ -9,6 +10,8 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
     prisma.contract.findMany({ where: { account: { isInternalSales: false } }, include: { account: true }, orderBy: { createdAt: "desc" } }),
     prisma.account.findMany({ where: { isInternalSales: false }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
+  const resolvedUrls = await resolveFileUrls(contracts.map((c) => c.documentUrl));
+  const resolvedContracts = contracts.map((c) => ({ ...c, documentUrl: c.documentUrl ? resolvedUrls[c.documentUrl] ?? c.documentUrl : null }));
 
   return (
     <div>
@@ -24,7 +27,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
       ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         <div className="lg:col-span-3">
-          <ContractsTable contracts={contracts} />
+          <ContractsTable contracts={resolvedContracts} />
         </div>
         <Card>
           <h3 className="mb-3 text-sm font-semibold text-zinc-700">+ Új szerződés</h3>
