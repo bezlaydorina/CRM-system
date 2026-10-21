@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import clsx from "clsx";
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={clsx("rounded-xl border border-zinc-200 bg-white p-4 shadow-sm", className)}>{children}</div>;
+  return <div className={clsx("rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900", className)}>{children}</div>;
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
@@ -10,7 +10,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
     <div className="mb-5 flex items-start justify-between gap-4">
       <div>
         <h1 className="text-xl font-semibold text-brand-text">{title}</h1>
-        {subtitle ? <p className="mt-0.5 text-sm text-zinc-500">{subtitle}</p> : null}
+        {subtitle ? <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{subtitle}</p> : null}
       </div>
       {actions}
     </div>
@@ -18,13 +18,13 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 }
 
 const BADGE_COLORS: Record<string, string> = {
-  gray: "bg-zinc-100 text-zinc-600",
+  gray: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
   indigo: "bg-brand-gold/15 text-brand-gold-dark",
-  green: "bg-green-100 text-green-700",
-  red: "bg-red-100 text-red-700",
-  amber: "bg-amber-100 text-amber-800",
-  blue: "bg-blue-100 text-blue-700",
-  purple: "bg-purple-100 text-purple-700",
+  green: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  red: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+  amber: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+  blue: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  purple: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
 };
 
 export function Badge({ children, color = "gray" }: { children: ReactNode; color?: keyof typeof BADGE_COLORS }) {
@@ -57,5 +57,5 @@ export function StubNotice({ feature }: { feature: string }) {
 }
 
 export function EmptyState({ text }: { text: string }) {
-  return <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-400">{text}</p>;
+  return <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-400 dark:border-zinc-700">{text}</p>;
 }

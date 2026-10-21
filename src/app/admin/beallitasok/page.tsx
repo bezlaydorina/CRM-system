@@ -4,6 +4,7 @@ import { getCurrentTeamMember } from "@/lib/auth";
 import { CUSTOM_FIELD_TYPES } from "@/lib/enums";
 import { addIntakeFieldAction, deleteIntakeFieldAction } from "@/lib/actions/intake-actions";
 import { updateOrganizationBrandingAction } from "@/lib/actions/org-actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function AdminSettingsPage() {
   const member = await getCurrentTeamMember();
@@ -55,6 +56,10 @@ export default async function AdminSettingsPage() {
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Saját profil</h2>
           <p className="text-sm text-zinc-600">{member?.name}</p>
           <p className="text-xs text-zinc-400">{member?.email} · {member?.jobRole}</p>
+        </Card>
+        <Card>
+          <h2 className="mb-3 text-sm font-semibold text-zinc-700">Megjelenés</h2>
+          <ThemeToggle />
         </Card>
         <IntakeFieldManager formKey="SALES_INTAKE" title="Értékesítési felvétel mezői" fields={salesFields} />
         <IntakeFieldManager formKey="ONBOARDING" title="Onboarding kérdőív mezői" fields={onboardingFields} />

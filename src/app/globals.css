@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
+/*
+ * Kézi (nem csak OS-preferencia alapú) sötét téma: a "dark:" variant a
+ * <html> elemen lévő "dark" class-ra reagál, amit a ThemeToggle komponens
+ * kapcsol (lásd src/components/theme-toggle.tsx), localStorage-ben
+ * perzisztálva nézőnként.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+}
+
+:root.dark {
+  --background: #1c1419;
+  --foreground: #ede6e2;
 }
 
 @theme inline {
@@ -26,6 +39,12 @@
   --color-brand-gold-dark: #9c8353;
   --color-brand-bg: #f7f2ea;
   --color-brand-text: #30252a;
+}
+
+:root.dark {
+  --color-brand-bg: #1c1419;
+  --color-brand-text: #ede6e2;
+  --color-brand-gold-dark: #d6bb87;
 }
 
 body {

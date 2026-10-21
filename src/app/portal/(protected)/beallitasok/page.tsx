@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId, getSession } from "@/lib/auth";
 import { PageHeader, Card, Badge } from "@/components/ui";
 import { InstallAppCard } from "@/components/install-app-card";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   updateOwnProfileAction,
   invitePortalTeammateAction,
@@ -86,7 +87,7 @@ export default async function PortalSettingsPage() {
 
         <Card>
           <h2 className="mb-3 text-sm font-semibold text-zinc-700">Megjelenés</h2>
-          <p className="text-sm text-zinc-500">Világos / Sötét / Rendszer téma váltó – ebben az MVP-ben csak a felület van előkészítve, a sötét téma stílusai még nincsenek kidolgozva.</p>
+          <ThemeToggle />
         </Card>
 
         <Card>

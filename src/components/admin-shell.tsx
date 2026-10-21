@@ -130,7 +130,7 @@ export function AdminShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3">
+        <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 dark:border-zinc-700 dark:bg-zinc-900">
           <div className="relative w-80">
             <input
               value={query}
@@ -144,7 +144,7 @@ export function AdminShell({
               className="w-full rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:border-brand-gold focus:outline-none"
             />
             {open && query && (
-              <div className="absolute z-20 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg">
+              <div className="absolute z-20 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
                 {filtered.length === 0 ? (
                   <p className="px-3 py-2 text-sm text-zinc-400">Nincs találat</p>
                 ) : (
