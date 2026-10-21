@@ -57,6 +57,7 @@ export async function createSignedUploadUrl(path: string): Promise<{ path: strin
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/upload/sign/${BUCKET}/${path}`, {
       method: "POST",
       headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({}),
     });
     if (!res.ok) {
       console.error(`[storage] Feltöltési link generálás sikertelen (${path}): ${res.status} ${await res.text()}`);
