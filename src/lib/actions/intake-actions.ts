@@ -29,8 +29,8 @@ export async function addIntakeFieldAction(formKey: string, formData: FormData) 
 }
 
 export async function deleteIntakeFieldAction(fieldId: string) {
-  await requireStaffSession();
-  await prisma.intakeFormFieldDefinition.delete({ where: { id: fieldId } });
+  const session = await requireStaffSession();
+  await prisma.intakeFormFieldDefinition.deleteMany({ where: { id: fieldId, organizationId: session.organizationId } });
   revalidatePath("/admin/beallitasok");
 }
 
