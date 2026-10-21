@@ -7,8 +7,7 @@ import { requireStaffSession } from "@/lib/auth";
 import { generateContractPdf } from "@/lib/contract-pdf";
 import { isDropboxSignConfigured, sendContractForSignature } from "@/lib/dropbox-sign";
 import { rewardReferralIfSigned } from "@/lib/referrals";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
+import { uploadObject } from "@/lib/storage";
 
 function revalidateFinanceSurfaces() {
   revalidatePath("/admin/fizetesek");
@@ -97,10 +96,8 @@ export async function sendContractForSignatureAction(contractId: string) {
     contractId: contract.id,
   });
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", contract.accountId, "contracts");
-  await mkdir(uploadDir, { recursive: true });
-  const fileName = `${contract.id}-${Date.now()}.pdf`;
-  await writeFile(path.join(uploadDir, fileName), pdf);
+  const objectPath = `${contract.accountId}/contracts/${contract.id}-${Date.now()}.pdf`;
+  const uploaded = await uploadObject(objectPath, pdf, "application/pdf");
 
   const result = await sendContractForSignature({
     pdf,
@@ -119,7 +116,7 @@ export async function sendContractForSignatureAction(contractId: string) {
     where: { id: contract.id },
     data: {
       status: "SENT",
-      documentUrl: `/uploads/${contract.accountId}/contracts/${fileName}`,
+      ...(uploaded ? { documentUrl: objectPath } : {}),
       dropboxSignRequestId: result.signatureRequestId,
     },
   });

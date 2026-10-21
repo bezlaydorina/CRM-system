@@ -3,6 +3,7 @@ import { getEffectiveAccountId } from "@/lib/auth";
 import { PageHeader } from "@/components/ui";
 import { ApprovalQueue } from "@/components/approvals/approval-queue";
 import { APPROVAL_TYPES } from "@/lib/enums";
+import { resolveFileUrls } from "@/lib/storage";
 import Link from "next/link";
 
 export default async function PortalApprovalsPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
@@ -13,6 +14,7 @@ export default async function PortalApprovalsPage({ searchParams }: { searchPara
     where: { accountId, type, status: { in: ["PENDING_CLIENT", "APPROVED", "REJECTED"] } },
     orderBy: { createdAt: "desc" },
   });
+  const resolvedUrls = await resolveFileUrls(items.map((i) => i.fileUrl));
 
   return (
     <div>
@@ -30,7 +32,7 @@ export default async function PortalApprovalsPage({ searchParams }: { searchPara
       </div>
       <ApprovalQueue
         mode="client"
-        items={items.map((i) => ({ id: i.id, title: i.title, type: i.type, status: i.status, fileUrl: i.fileUrl, createdAt: i.createdAt.toISOString() }))}
+        items={items.map((i) => ({ id: i.id, title: i.title, type: i.type, status: i.status, fileUrl: i.fileUrl ? resolvedUrls[i.fileUrl] ?? i.fileUrl : null, createdAt: i.createdAt.toISOString() }))}
       />
     </div>
   );

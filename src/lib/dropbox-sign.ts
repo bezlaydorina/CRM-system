@@ -1,11 +1,12 @@
 import api from "@dropbox/sign";
 import { createHmac } from "crypto";
-import { writeFile, unlink, mkdir } from "fs/promises";
+import { writeFile, unlink } from "fs/promises";
 import { createReadStream } from "fs";
 import path from "path";
 import os from "os";
 import { prisma } from "@/lib/prisma";
 import { rewardReferralIfSigned } from "@/lib/referrals";
+import { uploadObject } from "@/lib/storage";
 
 const API_KEY = process.env.DROPBOX_SIGN_API_KEY;
 const TEST_MODE = process.env.DROPBOX_SIGN_TEST_MODE !== "false"; // alapértelmezetten teszt-mód, nehogy véletlenül éles (jogilag kötelező érvényű) kérés menjen ki
@@ -139,11 +140,10 @@ export async function syncContractFromDropboxSign(signatureRequestId: string): P
   if (newStatus === "SIGNED") {
     const signedPdf = await downloadSignedPdf(signatureRequestId);
     if (signedPdf) {
-      const uploadDir = path.join(process.cwd(), "public", "uploads", contract.accountId, "contracts");
-      await mkdir(uploadDir, { recursive: true });
-      const fileName = `${contract.id}-signed-${Date.now()}.pdf`;
-      await writeFile(path.join(uploadDir, fileName), signedPdf);
-      documentUrl = `/uploads/${contract.accountId}/contracts/${fileName}`;
+      const objectPath = `${contract.accountId}/contracts/${contract.id}-signed-${Date.now()}.pdf`;
+      if (await uploadObject(objectPath, signedPdf, "application/pdf")) {
+        documentUrl = objectPath;
+      }
     }
   }
 

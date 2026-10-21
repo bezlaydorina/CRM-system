@@ -2,11 +2,13 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getEffectiveAccountId } from "@/lib/auth";
 import { PageHeader, Card, EmptyState } from "@/components/ui";
-import { uploadFileAction } from "@/lib/actions/file-actions";
+import { FileUploadForm } from "@/components/portal/file-upload-form";
+import { resolveFileUrls } from "@/lib/storage";
 
 export default async function PortalFilesPage() {
   const accountId = (await getEffectiveAccountId())!;
   const files = await prisma.fileAsset.findMany({ where: { accountId }, orderBy: { uploadedAt: "desc" } });
+  const resolvedUrls = await resolveFileUrls(files.map((f) => f.fileUrl));
 
   const folders = ["IMAGES", "VIDEOS", "OTHER"] as const;
   const labels: Record<string, string> = { IMAGES: "Képek", VIDEOS: "Videók", OTHER: "Egyéb" };
@@ -16,15 +18,7 @@ export default async function PortalFilesPage() {
       <PageHeader title="Képek feltöltése" subtitle="Nem kell rendszerezned, csak töltsd fel – mi elrendezzük" />
 
       <Card className="mb-6">
-        <form action={uploadFileAction} className="flex flex-wrap items-end gap-3">
-          <input name="file" type="file" required className="text-sm" />
-          <select name="folder" className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm">
-            <option value="IMAGES">Kép</option>
-            <option value="VIDEOS">Videó</option>
-            <option value="OTHER">Egyéb</option>
-          </select>
-          <button className="rounded-lg bg-brand-gold px-4 py-1.5 text-sm font-semibold text-white">Feltöltés</button>
-        </form>
+        <FileUploadForm />
       </Card>
 
       {folders.map((folder) => {
@@ -40,7 +34,7 @@ export default async function PortalFilesPage() {
                   <div key={f.id} className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
                     <div className="relative aspect-square bg-zinc-100">
                       {f.fileType === "image" ? (
-                        <Image src={f.fileUrl} alt={f.fileName} fill className="object-cover" unoptimized />
+                        <Image src={resolvedUrls[f.fileUrl] ?? f.fileUrl} alt={f.fileName} fill className="object-cover" unoptimized />
                       ) : (
                         <div className="flex h-full items-center justify-center text-2xl">🎬</div>
                       )}
