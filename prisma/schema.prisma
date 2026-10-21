@@ -21,10 +21,11 @@ model Organization {
   id             String          @id @default(cuid())
   name           String
   createdAt      DateTime        @default(now())
-  accounts       Account[]
-  teamMembers    TeamMember[]
-  tasks          Task[]
-  calendarEvents CalendarEvent[]
+  accounts               Account[]
+  teamMembers            TeamMember[]
+  tasks                  Task[]
+  calendarEvents         CalendarEvent[]
+  intakeFormFieldDefs    IntakeFormFieldDefinition[]
 }
 
 model TeamMember {
@@ -106,6 +107,7 @@ model Account {
   projects         Project[]
   referralsMade    Referral[] @relation("ReferralsMade")
   referralReceived Referral?  @relation("ReferralReceived")
+  intakeFormResponses IntakeFormResponse[]
 }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +270,37 @@ model CustomFieldDefinition {
   section    String   @default("Általános")
   options    String   @default("[]") // JSON array, for SELECT/MULTISELECT
   order      Int      @default(0)
+}
+
+// ---------------------------------------------------------------------------
+// Értékesítési felvétel / Onboarding kérdőív - szervezet-szintű kérdés-séma,
+// account-szintű válaszokkal (ugyanaz a JSON-alapú mező-motor, mint a
+// mini-CRM egyéni mezőinél, csak nem Pipeline-hoz, hanem Organization-höz
+// kötve, mert ez a két kérdőív minden ügyfélnél ugyanaz).
+// ---------------------------------------------------------------------------
+
+model IntakeFormFieldDefinition {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  formKey        String // SALES_INTAKE | ONBOARDING
+  name           String
+  type           String // TEXT|LONG_TEXT|NUMBER|DATE|SELECT|MULTISELECT|EMAIL|PHONE|URL|CHECKBOX
+  section        String       @default("Általános")
+  options        String       @default("[]") // JSON array, for SELECT/MULTISELECT
+  order          Int          @default(0)
+}
+
+model IntakeFormResponse {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id])
+  formKey   String // SALES_INTAKE | ONBOARDING
+  answers   String   @default("{}") // JSON blob kulcsolva IntakeFormFieldDefinition.id szerint
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([accountId, formKey])
 }
 
 model Webhook {

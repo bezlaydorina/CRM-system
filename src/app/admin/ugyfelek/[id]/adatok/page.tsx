@@ -3,17 +3,27 @@ import { prisma } from "@/lib/prisma";
 import { Card, Badge, EmptyState } from "@/components/ui";
 import { formatHUF, labelFor, PAYMENT_STATUSES } from "@/lib/enums";
 import { addCredentialAction, updateAccountDetailsAction } from "@/lib/actions/account-actions";
+import { saveIntakeResponseAction } from "@/lib/actions/intake-actions";
+import { DynamicFieldInput } from "@/components/dynamic-field-input";
+import { getCurrentTeamMember } from "@/lib/auth";
 
 export default async function AccountDataPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const account = await prisma.account.findUnique({
-    where: { id },
-    include: {
-      contacts: true,
-      credentials: true,
-      payments: { orderBy: { createdAt: "desc" } },
-    },
-  });
+  const member = await getCurrentTeamMember();
+  const [account, salesFields, onboardingFields, salesResponse, onboardingResponse] = await Promise.all([
+    prisma.account.findUnique({
+      where: { id },
+      include: {
+        contacts: true,
+        credentials: true,
+        payments: { orderBy: { createdAt: "desc" } },
+      },
+    }),
+    member ? prisma.intakeFormFieldDefinition.findMany({ where: { organizationId: member.organizationId, formKey: "SALES_INTAKE" }, orderBy: { order: "asc" } }) : [],
+    member ? prisma.intakeFormFieldDefinition.findMany({ where: { organizationId: member.organizationId, formKey: "ONBOARDING" }, orderBy: { order: "asc" } }) : [],
+    prisma.intakeFormResponse.findUnique({ where: { accountId_formKey: { accountId: id, formKey: "SALES_INTAKE" } } }),
+    prisma.intakeFormResponse.findUnique({ where: { accountId_formKey: { accountId: id, formKey: "ONBOARDING" } } }),
+  ]);
   if (!account) notFound();
 
   return (
@@ -67,14 +77,20 @@ export default async function AccountDataPage({ params }: { params: Promise<{ id
           </form>
         </Card>
 
-        <Card className="border-dashed bg-zinc-50">
-          <h2 className="mb-1 text-sm font-semibold text-zinc-600">Kitöltött űrlapválaszok</h2>
-          <p className="text-xs text-zinc-500">
-            Az &quot;Értékesítési felvétel&quot; és az &quot;Onboarding kérdőív&quot; dinamikus kérdés-válasz nézete ebben az MVP-ben
-            nincs implementálva; a dinamikus egyéni mezők a mini-CRM Opportunity szintjén már működnek (lásd CRM
-            és leadek fül), ugyanazzal a JSON-alapú séma-motorral bővíthető ide is.
-          </p>
-        </Card>
+        <IntakeFormCard
+          accountId={id}
+          formKey="SALES_INTAKE"
+          title="Értékesítési felvétel"
+          fields={salesFields}
+          answers={salesResponse ? JSON.parse(salesResponse.answers) : {}}
+        />
+        <IntakeFormCard
+          accountId={id}
+          formKey="ONBOARDING"
+          title="Onboarding kérdőív"
+          fields={onboardingFields}
+          answers={onboardingResponse ? JSON.parse(onboardingResponse.answers) : {}}
+        />
       </div>
 
       <Card>
@@ -106,5 +122,56 @@ export default async function AccountDataPage({ params }: { params: Promise<{ id
         {account.payments.length === 0 ? <EmptyState text="Nincs fizetési előzmény" /> : null}
       </Card>
     </div>
+  );
+}
+
+function IntakeFormCard({
+  accountId,
+  formKey,
+  title,
+  fields,
+  answers,
+}: {
+  accountId: string;
+  formKey: string;
+  title: string;
+  fields: { id: string; name: string; type: string; options: string; section: string }[];
+  answers: Record<string, unknown>;
+}) {
+  if (fields.length === 0) {
+    return (
+      <Card className="border-dashed bg-zinc-50">
+        <h2 className="mb-1 text-sm font-semibold text-zinc-600">{title}</h2>
+        <p className="text-xs text-zinc-500">
+          Még nincs kérdés beállítva ehhez az űrlaphoz – add hozzá a kérdéseket a Beállítások oldalon ({title.toLowerCase()} mezői), utána itt
+          minden ügyfélnél kitölthető lesz.
+        </p>
+      </Card>
+    );
+  }
+
+  const bySection = new Map<string, typeof fields>();
+  for (const f of fields) {
+    if (!bySection.has(f.section)) bySection.set(f.section, []);
+    bySection.get(f.section)!.push(f);
+  }
+
+  return (
+    <Card>
+      <h2 className="mb-3 text-sm font-semibold text-zinc-700">{title}</h2>
+      <form action={saveIntakeResponseAction.bind(null, accountId, formKey)} className="space-y-3">
+        {Array.from(bySection.entries()).map(([section, sectionFields]) => (
+          <div key={section}>
+            <p className="mb-1 text-xs font-semibold uppercase text-zinc-400">{section}</p>
+            <div className="space-y-2">
+              {sectionFields.map((f) => (
+                <DynamicFieldInput key={f.id} field={f} value={answers[f.id]} />
+              ))}
+            </div>
+          </div>
+        ))}
+        <button className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white">Mentés</button>
+      </form>
+    </Card>
   );
 }
