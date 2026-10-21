@@ -90,20 +90,37 @@ model Account {
 
   createdAt DateTime @default(now())
 
-  contacts        Contact[]
-  assignments     TeamAssignment[]
-  pipelines       Pipeline[]
-  tasks           Task[]
-  approvalItems   ApprovalItem[]
-  payments        Payment[]
-  contracts       Contract[]
-  reports         Report[]
-  conversation    Conversation?
-  fileAssets      FileAsset[]
-  credentials     Credential[]
-  activityEntries ActivityLogEntry[]
-  calendarEvents  CalendarEvent[]
-  projects        Project[]
+  contacts         Contact[]
+  assignments      TeamAssignment[]
+  pipelines        Pipeline[]
+  tasks            Task[]
+  approvalItems    ApprovalItem[]
+  payments         Payment[]
+  contracts        Contract[]
+  reports          Report[]
+  conversation     Conversation?
+  fileAssets       FileAsset[]
+  credentials      Credential[]
+  activityEntries  ActivityLogEntry[]
+  calendarEvents   CalendarEvent[]
+  projects         Project[]
+  referralsMade    Referral[] @relation("ReferralsMade")
+  referralReceived Referral?  @relation("ReferralReceived")
+}
+
+// ---------------------------------------------------------------------------
+// Affiliate / ajánlói program
+// ---------------------------------------------------------------------------
+
+model Referral {
+  id                String    @id @default(cuid())
+  referrerAccountId String
+  referrerAccount   Account   @relation("ReferralsMade", fields: [referrerAccountId], references: [id])
+  referredAccountId String    @unique
+  referredAccount   Account   @relation("ReferralReceived", fields: [referredAccountId], references: [id])
+  status            String    @default("PENDING") // PENDING | REWARDED
+  rewardedAt        DateTime?
+  createdAt         DateTime  @default(now())
 }
 
 model Contact {

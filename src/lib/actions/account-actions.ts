@@ -10,6 +10,7 @@ import { ACCOUNT_LIFECYCLE_STAGES, ACCOUNT_PACKAGES } from "@/lib/enums";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { portalInviteEmail, portalReadyEmail } from "@/lib/email-templates";
 import { createPortalSetupToken } from "@/lib/auth-tokens";
+import { linkReferralIfValid } from "@/lib/referrals";
 
 export async function moveAccountStage(accountId: string, newStage: string) {
   await requireStaffSession();
@@ -99,6 +100,7 @@ export async function quickSaveAccountAction(formData: FormData) {
   });
 
   await createDefaultCrmSetup(account.id);
+  await linkReferralIfValid(account.id, formData.get("referralCode") as string | null);
 
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;
@@ -155,6 +157,7 @@ export async function createFullAccountAction(formData: FormData) {
   });
 
   await createDefaultCrmSetup(account.id);
+  await linkReferralIfValid(account.id, formData.get("referralCode") as string | null);
 
   const password = String(formData.get("password") ?? "");
   const setPassword = formData.get("setPassword") === "on" && password.length >= 4;

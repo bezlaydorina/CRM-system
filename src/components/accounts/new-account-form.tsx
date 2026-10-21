@@ -46,6 +46,7 @@ export function NewAccountForm() {
           <Field label="Keresztnév *" name="contactFirstName" placeholder="János" required />
           <Field label="Telefonszám" name="phone" placeholder="+36 30 123 4567" />
           <Field label="E-mail cím *" name="email" type="email" placeholder="ugyfel@ceg.hu" required />
+          <Field label="Ajánlói kód (opcionális)" name="referralCode" placeholder="THECODE-ABC123" className="sm:col-span-2" />
         </div>
 
         <label className="mt-4 flex items-start gap-2 border-t border-zinc-100 pt-4 text-sm">

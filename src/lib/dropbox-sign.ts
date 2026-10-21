@@ -5,6 +5,7 @@ import { createReadStream } from "fs";
 import path from "path";
 import os from "os";
 import { prisma } from "@/lib/prisma";
+import { rewardReferralIfSigned } from "@/lib/referrals";
 
 const API_KEY = process.env.DROPBOX_SIGN_API_KEY;
 const TEST_MODE = process.env.DROPBOX_SIGN_TEST_MODE !== "false"; // alapértelmezetten teszt-mód, nehogy véletlenül éles (jogilag kötelező érvényű) kérés menjen ki
@@ -154,4 +155,6 @@ export async function syncContractFromDropboxSign(signatureRequestId: string): P
       signedAt: newStatus === "SIGNED" ? new Date((state.signedAt ?? Date.now() / 1000) * 1000) : contract.signedAt,
     },
   });
+
+  if (newStatus === "SIGNED") await rewardReferralIfSigned(contract.accountId);
 }
